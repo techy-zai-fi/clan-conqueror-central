@@ -2,9 +2,37 @@ import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Megaphone, AlertCircle, Clock } from 'lucide-react';
-import { announcements } from '@/data/mockData';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Announcement {
+  id: string;
+  title: string;
+  message: string;
+  urgent: boolean;
+  created_at: string;
+}
 
 export default function Announcements() {
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      const { data, error } = await supabase
+        .from('announcements')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching announcements:', error);
+        return;
+      }
+
+      setAnnouncements(data || []);
+    };
+
+    fetchAnnouncements();
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -56,7 +84,7 @@ export default function Announcements() {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="h-4 w-4" />
                   <span>
-                    {new Date(announcement.timestamp).toLocaleString('en-IN', {
+                    {new Date(announcement.created_at).toLocaleString('en-IN', {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',

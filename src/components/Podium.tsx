@@ -1,9 +1,40 @@
 import { Trophy, Medal } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { clans } from '@/data/mockData';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Clan {
+  id: string;
+  name: string;
+  logo: string;
+  color: string;
+  total_points: number;
+}
 
 export default function Podium() {
-  const topClans = clans.slice(0, 3);
+  const [topClans, setTopClans] = useState<Clan[]>([]);
+
+  useEffect(() => {
+    const fetchTopClans = async () => {
+      const { data, error } = await supabase
+        .from('clans')
+        .select('*')
+        .order('total_points', { ascending: false })
+        .limit(3);
+
+      if (error) {
+        console.error('Error fetching clans:', error);
+        return;
+      }
+
+      setTopClans(data || []);
+    };
+
+    fetchTopClans();
+  }, []);
+
+  if (topClans.length < 3) return null;
+
   const [first, second, third] = topClans;
 
   return (
@@ -31,7 +62,7 @@ export default function Podium() {
           </div>
           <div className="text-6xl mb-3">{second.logo}</div>
           <h3 className="text-lg font-bold text-center mb-1">{second.name}</h3>
-          <p className="text-3xl font-bold text-foreground mb-2">{second.totalPoints}</p>
+          <p className="text-3xl font-bold text-foreground mb-2">{second.total_points}</p>
           <div className="w-20 h-32 bg-gradient-to-t from-zinc-400/30 to-transparent rounded-t-lg" />
           <div className="mt-2 text-2xl font-bold text-zinc-400">2nd</div>
         </Card>
@@ -49,7 +80,7 @@ export default function Podium() {
           </div>
           <div className="text-7xl mb-4">{first.logo}</div>
           <h3 className="text-xl font-bold text-center mb-2">{first.name}</h3>
-          <p className="text-4xl font-bold text-accent mb-3">{first.totalPoints}</p>
+          <p className="text-4xl font-bold text-accent mb-3">{first.total_points}</p>
           <div className="w-24 h-48 bg-gradient-to-t from-accent/40 via-accent/20 to-transparent rounded-t-lg" />
           <div className="mt-3 text-3xl font-bold text-accent">1st</div>
         </Card>
@@ -68,7 +99,7 @@ export default function Podium() {
           </div>
           <div className="text-6xl mb-3">{third.logo}</div>
           <h3 className="text-lg font-bold text-center mb-1">{third.name}</h3>
-          <p className="text-3xl font-bold text-foreground mb-2">{third.totalPoints}</p>
+          <p className="text-3xl font-bold text-foreground mb-2">{third.total_points}</p>
           <div className="w-20 h-24 bg-gradient-to-t from-amber-700/30 to-transparent rounded-t-lg" />
           <div className="mt-2 text-2xl font-bold text-amber-700">3rd</div>
         </Card>

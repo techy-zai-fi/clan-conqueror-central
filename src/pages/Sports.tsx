@@ -3,9 +3,36 @@ import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
-import { sports } from '@/data/mockData';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Sport {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+}
 
 export default function Sports() {
+  const [sports, setSports] = useState<Sport[]>([]);
+
+  useEffect(() => {
+    const fetchSports = async () => {
+      const { data, error } = await supabase
+        .from('sports')
+        .select('*')
+        .order('name');
+
+      if (error) {
+        console.error('Error fetching sports:', error);
+        return;
+      }
+
+      setSports(data || []);
+    };
+
+    fetchSports();
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       <Navbar />

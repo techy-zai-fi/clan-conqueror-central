@@ -2,9 +2,42 @@ import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, MapPin } from 'lucide-react';
-import { upcomingMatches } from '@/data/mockData';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Match {
+  id: string;
+  sport_name: string;
+  clan1: string;
+  clan2: string;
+  date: string;
+  time: string;
+  venue: string;
+  status: string;
+  score1: number | null;
+  score2: number | null;
+}
 
 export default function Schedule() {
+  const [matches, setMatches] = useState<Match[]>([]);
+
+  useEffect(() => {
+    const fetchMatches = async () => {
+      const { data, error } = await supabase
+        .from('matches')
+        .select('*')
+        .order('date', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching matches:', error);
+        return;
+      }
+
+      setMatches(data || []);
+    };
+
+    fetchMatches();
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -20,7 +53,7 @@ export default function Schedule() {
         </div>
 
         <div className="max-w-4xl mx-auto space-y-6">
-          {upcomingMatches.map((match, index) => (
+          {matches.map((match, index) => (
             <Card
               key={match.id}
               className="animate-slide-up bg-gradient-to-br from-card to-secondary/20 border-2 hover:border-primary/50 transition-all"
@@ -29,8 +62,8 @@ export default function Schedule() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-2xl flex items-center gap-2">
-                    <span className="text-4xl">{match.sportName === 'Cricket' ? '🏏' : match.sportName === 'Football' ? '⚽' : match.sportName === 'Basketball' ? '🏀' : '🏐'}</span>
-                    {match.sportName}
+                    <span className="text-4xl">{match.sport_name === 'Cricket' ? '🏏' : match.sport_name === 'Football' ? '⚽' : match.sport_name === 'Basketball' ? '🏀' : '🏐'}</span>
+                    {match.sport_name}
                   </CardTitle>
                   {match.status === 'live' && (
                     <Badge variant="destructive" className="animate-pulse text-lg px-4 py-1">
@@ -103,7 +136,7 @@ export default function Schedule() {
         </div>
 
         {/* Empty State */}
-        {upcomingMatches.length === 0 && (
+        {matches.length === 0 && (
           <Card className="max-w-2xl mx-auto">
             <CardContent className="text-center py-12">
               <Calendar className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
