@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Podium from '@/components/Podium';
 import UpcomingMatches from '@/components/UpcomingMatches';
@@ -7,9 +9,60 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Trophy, Users, Calendar, TrendingUp } from 'lucide-react';
 import heroBanner from '@/assets/hero-banner.jpg';
-import { clans, highlights } from '@/data/mockData';
+
+interface Clan {
+  id: string;
+  name: string;
+  tagline: string;
+  logo: string;
+  total_points: number;
+}
+
+interface Highlight {
+  id: string;
+  date: string;
+  description: string;
+}
 
 export default function Index() {
+  const [clans, setClans] = useState<Clan[]>([]);
+  const [highlights, setHighlights] = useState<Highlight[]>([]);
+  const [totalClans, setTotalClans] = useState(0);
+  const [totalSports, setTotalSports] = useState(0);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    // Fetch clans
+    const { data: clansData } = await supabase
+      .from('clans')
+      .select('*')
+      .order('rank', { ascending: true, nullsFirst: false });
+    
+    if (clansData) {
+      setClans(clansData);
+      setTotalClans(clansData.length);
+    }
+
+    // Fetch highlights
+    const { data: highlightsData } = await supabase
+      .from('highlights')
+      .select('*')
+      .order('date', { ascending: false })
+      .limit(5);
+    
+    if (highlightsData) setHighlights(highlightsData);
+
+    // Fetch sports count
+    const { count } = await supabase
+      .from('sports')
+      .select('*', { count: 'exact', head: true });
+    
+    if (count) setTotalSports(count);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -63,7 +116,7 @@ export default function Index() {
             <CardContent>
               <div className="text-4xl font-bold text-primary flex items-center gap-2">
                 <Users className="h-8 w-8" />
-                6
+                {totalClans}
               </div>
             </CardContent>
           </Card>
@@ -77,7 +130,7 @@ export default function Index() {
             <CardContent>
               <div className="text-4xl font-bold text-accent flex items-center gap-2">
                 <Trophy className="h-8 w-8" />
-                8
+                {totalSports}
               </div>
             </CardContent>
           </Card>
@@ -121,7 +174,7 @@ export default function Index() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {clans.map((clan, index) => (
+              {clans.slice(0, 6).map((clan, index) => (
                 <div
                   key={clan.id}
                   className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border hover:border-primary/50 transition-all"
@@ -136,7 +189,7 @@ export default function Index() {
                       <div className="text-xs text-muted-foreground">{clan.tagline}</div>
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-accent">{clan.totalPoints}</div>
+                  <div className="text-2xl font-bold text-accent">{clan.total_points}</div>
                 </div>
               ))}
               <Link to="/leaderboard">
@@ -156,26 +209,24 @@ export default function Index() {
               <CardTitle>Highlights of the Day</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {highlights.map((highlight) => (
-                <div
-                  key={highlight.id}
-                  className="p-4 rounded-lg bg-background/50 border border-border"
-                >
-                  <div className="flex items-start gap-3">
-                    <Trophy className="h-5 w-5 text-accent mt-1" />
-                    <div>
-                      <p className="font-medium text-foreground">{highlight.description}</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {new Date(highlight.date).toLocaleDateString('en-IN', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric'
-                        })}
-                      </p>
+              {highlights.length > 0 ? (
+                highlights.map((highlight) => (
+                  <div
+                    key={highlight.id}
+                    className="p-4 rounded-lg bg-background/50 border border-border"
+                  >
+                    <div className="flex items-start gap-3">
+                      <Trophy className="h-5 w-5 text-accent mt-1" />
+                      <div>
+                        <p className="font-medium text-foreground">{highlight.description}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{highlight.date}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-muted-foreground text-center py-4">No highlights yet. Check back soon!</p>
+              )}
             </CardContent>
           </Card>
         </section>

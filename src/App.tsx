@@ -9,6 +9,8 @@ import Sports from "./pages/Sports";
 import Leaderboard from "./pages/Leaderboard";
 import Schedule from "./pages/Schedule";
 import Announcements from "./pages/Announcements";
+import Auth from "./pages/Auth";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/announcements" element={<Announcements />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

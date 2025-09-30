@@ -1,11 +1,12 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Trophy, Menu } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Trophy, Menu, LogOut, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useAuth } from '@/hooks/useAuth';
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -18,6 +19,8 @@ const navLinks = [
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -43,6 +46,30 @@ export default function Navbar() {
                 </Button>
               </Link>
             ))}
+            {isAdmin && (
+              <Link to="/admin">
+                <Button
+                  variant={location.pathname === '/admin' ? 'default' : 'ghost'}
+                  className="transition-all"
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  Admin
+                </Button>
+              </Link>
+            )}
+            {user ? (
+              <>
+                <span className="text-sm text-muted-foreground ml-2">{user.email?.split('@')[0]}</span>
+                <Button variant="outline" size="sm" onClick={signOut} className="ml-2">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => navigate('/auth')} className="ml-2">
+                Login
+              </Button>
+            )}
           </div>
 
           {/* Mobile Navigation */}
@@ -64,6 +91,32 @@ export default function Navbar() {
                     </Button>
                   </Link>
                 ))}
+                {isAdmin && (
+                  <Link to="/admin">
+                    <Button
+                      variant={location.pathname === '/admin' ? 'default' : 'ghost'}
+                      className="w-full justify-start"
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
+                <div className="border-t pt-4 mt-4">
+                  {user ? (
+                    <>
+                      <p className="text-sm text-muted-foreground mb-2">{user.email}</p>
+                      <Button variant="outline" size="sm" className="w-full" onClick={signOut}>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Logout
+                      </Button>
+                    </>
+                  ) : (
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/auth')}>
+                      Login
+                    </Button>
+                  )}
+                </div>
               </div>
             </SheetContent>
           </Sheet>

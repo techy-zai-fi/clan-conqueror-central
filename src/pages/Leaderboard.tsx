@@ -1,9 +1,49 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy, Medal, TrendingUp, Award } from 'lucide-react';
-import { clans } from '@/data/mockData';
+
+interface Clan {
+  id: string;
+  name: string;
+  tagline: string;
+  color: string;
+  logo: string;
+  mascot: string;
+  total_points: number;
+  rank: number | null;
+}
 
 export default function Leaderboard() {
+  const [clans, setClans] = useState<Clan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchClans();
+  }, []);
+
+  const fetchClans = async () => {
+    const { data } = await supabase
+      .from('clans')
+      .select('*')
+      .order('rank', { ascending: true, nullsFirst: false });
+    
+    if (data) setClans(data);
+    setLoading(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 py-12 text-center">
+          <p>Loading leaderboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -23,9 +63,9 @@ export default function Leaderboard() {
           {clans.map((clan, index) => {
             const isTop3 = index < 3;
             const icons = [
-              <Trophy className="h-8 w-8 text-yellow-400" />,
-              <Medal className="h-8 w-8 text-zinc-400" />,
-              <Medal className="h-8 w-8 text-amber-700" />
+              <Trophy key="1" className="h-8 w-8 text-yellow-400" />,
+              <Medal key="2" className="h-8 w-8 text-zinc-400" />,
+              <Medal key="3" className="h-8 w-8 text-amber-700" />
             ];
 
             return (
@@ -85,7 +125,7 @@ export default function Leaderboard() {
                       {/* Points */}
                       <div className="flex flex-col items-center min-w-[100px]">
                         <div className="text-4xl font-bold text-accent mb-1">
-                          {clan.totalPoints}
+                          {clan.total_points}
                         </div>
                         <span className="text-xs text-muted-foreground">POINTS</span>
                       </div>
@@ -98,48 +138,50 @@ export default function Leaderboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-4xl mx-auto">
-          <Card className="bg-gradient-to-br from-primary/20 to-card border-primary/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Highest Scorer
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{clans[0].name}</div>
-              <div className="text-lg text-accent mt-1">{clans[0].totalPoints} points</div>
-            </CardContent>
-          </Card>
+        {clans.length >= 2 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-4xl mx-auto">
+            <Card className="bg-gradient-to-br from-primary/20 to-card border-primary/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  Highest Scorer
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">{clans[0].name}</div>
+                <div className="text-lg text-accent mt-1">{clans[0].total_points} points</div>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-gradient-to-br from-accent/20 to-card border-accent/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm">
-                <Award className="h-5 w-5 text-accent" />
-                Most Wins
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{clans[0].name}</div>
-              <div className="text-lg text-accent mt-1">12 victories</div>
-            </CardContent>
-          </Card>
+            <Card className="bg-gradient-to-br from-accent/20 to-card border-accent/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <Award className="h-5 w-5 text-accent" />
+                  Most Wins
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">{clans[0].name}</div>
+                <div className="text-lg text-accent mt-1">Leading</div>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-gradient-to-br from-green-500/20 to-card border-green-500/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm">
-                <Trophy className="h-5 w-5 text-green-500" />
-                Point Gap
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">
-                {clans[0].totalPoints - clans[1].totalPoints}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">1st to 2nd place</div>
-            </CardContent>
-          </Card>
-        </div>
+            <Card className="bg-gradient-to-br from-green-500/20 to-card border-green-500/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <Trophy className="h-5 w-5 text-green-500" />
+                  Point Gap
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">
+                  {clans[0].total_points - clans[1].total_points}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">1st to 2nd place</div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );
