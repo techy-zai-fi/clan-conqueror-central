@@ -96,6 +96,12 @@ export default function AdminMatches() {
           .eq('id', editingMatch.id);
 
         if (error) throw error;
+        
+        // Update clan points if match is completed
+        if (matchData.status === 'completed' && matchData.winner) {
+          await updateClanPoints(matchData.winner);
+        }
+        
         toast.success('Match updated successfully');
       } else {
         const { error } = await supabase
@@ -111,6 +117,25 @@ export default function AdminMatches() {
       fetchMatches();
     } catch (error: any) {
       toast.error(error.message || 'Error saving match');
+    }
+  };
+
+  const updateClanPoints = async (winnerName: string) => {
+    try {
+      const { data: clan } = await supabase
+        .from('clans')
+        .select('total_points')
+        .eq('name', winnerName)
+        .single();
+      
+      if (clan) {
+        await supabase
+          .from('clans')
+          .update({ total_points: (clan.total_points || 0) + 3 })
+          .eq('name', winnerName);
+      }
+    } catch (error) {
+      console.error('Error updating clan points:', error);
     }
   };
 

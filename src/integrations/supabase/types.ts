@@ -38,6 +38,41 @@ export type Database = {
         }
         Relationships: []
       }
+      clan_members: {
+        Row: {
+          clan_id: string
+          created_at: string | null
+          id: string
+          name: string
+          profile_image: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          clan_id: string
+          created_at?: string | null
+          id?: string
+          name: string
+          profile_image?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          clan_id?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          profile_image?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clan_members_clan_id_fkey"
+            columns: ["clan_id"]
+            isOneToOne: false
+            referencedRelation: "clans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clans: {
         Row: {
           color: string
@@ -180,6 +215,52 @@ export type Database = {
           id?: string
         }
         Relationships: []
+      }
+      sport_team_members: {
+        Row: {
+          clan_id: string
+          created_at: string | null
+          id: string
+          match_id: string
+          member_id: string
+        }
+        Insert: {
+          clan_id: string
+          created_at?: string | null
+          id?: string
+          match_id: string
+          member_id: string
+        }
+        Update: {
+          clan_id?: string
+          created_at?: string | null
+          id?: string
+          match_id?: string
+          member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sport_team_members_clan_id_fkey"
+            columns: ["clan_id"]
+            isOneToOne: false
+            referencedRelation: "clans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sport_team_members_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sport_team_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "clan_members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sports: {
         Row: {
