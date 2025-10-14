@@ -17,8 +17,15 @@ interface Clan {
   rank: number | null;
 }
 
+interface ClanMember {
+  id: string;
+  name: string;
+  profile_image: string | null;
+}
+
 export default function Clans() {
   const [clans, setClans] = useState<Clan[]>([]);
+  const [clanMembers, setClanMembers] = useState<{ [clanId: string]: ClanMember[] }>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,8 +38,23 @@ export default function Clans() {
       .select('*')
       .order('rank', { ascending: true, nullsFirst: false });
     
-    if (data) setClans(data);
+    if (data) {
+      setClans(data);
+      // Fetch members for each clan
+      data.forEach(clan => fetchClanMembers(clan.id));
+    }
     setLoading(false);
+  };
+
+  const fetchClanMembers = async (clanId: string) => {
+    const { data } = await supabase
+      .from('clan_members')
+      .select('id, name, profile_image')
+      .eq('clan_id', clanId);
+    
+    if (data) {
+      setClanMembers(prev => ({ ...prev, [clanId]: data }));
+    }
   };
 
   if (loading) {
@@ -110,10 +132,38 @@ export default function Clans() {
                     <span className="text-muted-foreground">{clan.mascot}</span>
                   </div>
 
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-secondary/30">
-                    <Users className="h-5 w-5" style={{ color: clan.color }} />
-                    <span className="font-medium">Team Spirit:</span>
-                    <span className="text-accent">Unbreakable</span>
+                  <div className="p-3 rounded-lg bg-secondary/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Users className="h-5 w-5" style={{ color: clan.color }} />
+                      <span className="font-medium">Team Members</span>
+                    </div>
+                    {clanMembers[clan.id] && clanMembers[clan.id].length > 0 ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        {clanMembers[clan.id].slice(0, 6).map((member) => (
+                          <div key={member.id} className="flex items-center gap-2 text-sm">
+                            {member.profile_image ? (
+                              <img 
+                                src={member.profile_image} 
+                                alt={member.name}
+                                className="w-6 h-6 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs">
+                                {member.name.charAt(0)}
+                              </div>
+                            )}
+                            <span className="text-muted-foreground truncate">{member.name}</span>
+                          </div>
+                        ))}
+                        {clanMembers[clan.id].length > 6 && (
+                          <span className="text-xs text-muted-foreground col-span-2">
+                            +{clanMembers[clan.id].length - 6} more
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">No members yet</span>
+                    )}
                   </div>
                 </CardContent>
               </Card>

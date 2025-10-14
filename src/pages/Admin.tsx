@@ -11,6 +11,7 @@ import AdminMatches from '@/components/admin/AdminMatches';
 import AdminAnnouncements from '@/components/admin/AdminAnnouncements';
 import AdminHighlights from '@/components/admin/AdminHighlights';
 import AdminClanMembers from '@/components/admin/AdminClanMembers';
+import AdminTeamRosters from '@/components/admin/AdminTeamRosters';
 
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
@@ -51,9 +52,10 @@ export default function Admin() {
         </Card>
 
         <Tabs defaultValue="clans" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="clans">Clans</TabsTrigger>
             <TabsTrigger value="members">Members</TabsTrigger>
+            <TabsTrigger value="rosters">Rosters</TabsTrigger>
             <TabsTrigger value="sports">Sports</TabsTrigger>
             <TabsTrigger value="matches">Matches</TabsTrigger>
             <TabsTrigger value="announcements">Announcements</TabsTrigger>
@@ -66,6 +68,10 @@ export default function Admin() {
           
           <TabsContent value="members">
             <AdminClanMembers />
+          </TabsContent>
+          
+          <TabsContent value="rosters">
+            <AdminTeamRosters />
           </TabsContent>
           
           <TabsContent value="sports">
