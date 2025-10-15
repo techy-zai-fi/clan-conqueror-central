@@ -13,8 +13,11 @@ interface Clan {
   name: string;
   tagline: string;
   color: string;
+  sub_color: string | null;
   logo: string;
   mascot: string;
+  bg_image: string | null;
+  display_order: number | null;
   total_points: number;
   rank: number | null;
 }
@@ -28,8 +31,11 @@ export default function AdminClans() {
     name: '',
     tagline: '',
     color: '#000000',
+    sub_color: '#000000',
     logo: '',
     mascot: '',
+    bg_image: '',
+    display_order: 1,
     total_points: 0,
     rank: 1,
   });
@@ -105,8 +111,11 @@ export default function AdminClans() {
       name: '',
       tagline: '',
       color: '#000000',
+      sub_color: '#000000',
       logo: '',
       mascot: '',
+      bg_image: '',
+      display_order: 1,
       total_points: 0,
       rank: 1,
     });
@@ -119,8 +128,11 @@ export default function AdminClans() {
       name: clan.name,
       tagline: clan.tagline,
       color: clan.color,
+      sub_color: clan.sub_color || '#000000',
       logo: clan.logo,
       mascot: clan.mascot,
+      bg_image: clan.bg_image || '',
+      display_order: clan.display_order || 1,
       total_points: clan.total_points,
       rank: clan.rank || 1,
     });
@@ -189,6 +201,33 @@ export default function AdminClans() {
                   value={formData.mascot}
                   onChange={(e) => setFormData({ ...formData, mascot: e.target.value })}
                   required
+                />
+              </div>
+              <div>
+                <Label htmlFor="sub_color">Sub Color (hex)</Label>
+                <Input
+                  id="sub_color"
+                  type="color"
+                  value={formData.sub_color}
+                  onChange={(e) => setFormData({ ...formData, sub_color: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="bg_image">Background Image URL</Label>
+                <Input
+                  id="bg_image"
+                  value={formData.bg_image}
+                  onChange={(e) => setFormData({ ...formData, bg_image: e.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <Label htmlFor="display_order">Display Order</Label>
+                <Input
+                  id="display_order"
+                  type="number"
+                  value={formData.display_order}
+                  onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) })}
                 />
               </div>
               <div>

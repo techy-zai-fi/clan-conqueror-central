@@ -14,6 +14,11 @@ interface ClanMember {
   clan_id: string;
   name: string;
   profile_image: string | null;
+  email: string | null;
+  reg_num: string | null;
+  gender: string | null;
+  batch: string | null;
+  year: number | null;
 }
 
 interface Clan {
@@ -31,6 +36,11 @@ export default function AdminClanMembers() {
     clan_id: '',
     name: '',
     profile_image: '',
+    email: '',
+    reg_num: '',
+    gender: '',
+    batch: '',
+    year: null as number | null,
   });
   const { toast } = useToast();
 
@@ -110,7 +120,16 @@ export default function AdminClanMembers() {
   };
 
   const resetForm = () => {
-    setFormData({ clan_id: '', name: '', profile_image: '' });
+    setFormData({ 
+      clan_id: '', 
+      name: '', 
+      profile_image: '',
+      email: '',
+      reg_num: '',
+      gender: '',
+      batch: '',
+      year: null,
+    });
     setEditingMember(null);
     setDialogOpen(false);
   };
@@ -121,6 +140,11 @@ export default function AdminClanMembers() {
       clan_id: member.clan_id,
       name: member.name,
       profile_image: member.profile_image || '',
+      email: member.email || '',
+      reg_num: member.reg_num || '',
+      gender: member.gender || '',
+      batch: member.batch || '',
+      year: member.year || null,
     });
     setDialogOpen(true);
   };
@@ -174,6 +198,53 @@ export default function AdminClanMembers() {
                   placeholder="https://..."
                 />
               </div>
+              <div>
+                <Label>Email</Label>
+                <Input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="student@example.com"
+                />
+              </div>
+              <div>
+                <Label>Registration Number</Label>
+                <Input
+                  value={formData.reg_num}
+                  onChange={(e) => setFormData({ ...formData, reg_num: e.target.value })}
+                  placeholder="DBM/1001/03"
+                />
+              </div>
+              <div>
+                <Label>Gender</Label>
+                <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Batch</Label>
+                <Input
+                  value={formData.batch}
+                  onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
+                  placeholder="DBM, HHM, etc."
+                />
+              </div>
+              <div>
+                <Label>Year</Label>
+                <Input
+                  type="number"
+                  value={formData.year || ''}
+                  onChange={(e) => setFormData({ ...formData, year: e.target.value ? parseInt(e.target.value) : null })}
+                  placeholder="3"
+                />
+              </div>
               <Button type="submit" className="w-full">
                 {editingMember ? 'Update' : 'Add'} Member
               </Button>
@@ -205,6 +276,9 @@ export default function AdminClanMembers() {
                   <img src={member.profile_image} alt={member.name} className="w-20 h-20 rounded-full mb-2 object-cover" />
                 )}
                 <p className="text-sm text-muted-foreground">Clan: {clan?.name}</p>
+                {member.reg_num && <p className="text-xs text-muted-foreground">Reg: {member.reg_num}</p>}
+                {member.email && <p className="text-xs text-muted-foreground">{member.email}</p>}
+                {member.batch && member.year && <p className="text-xs text-muted-foreground">{member.batch} - Year {member.year}</p>}
               </CardContent>
             </Card>
           );
