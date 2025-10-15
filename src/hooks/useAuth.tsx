@@ -9,32 +9,44 @@ export function useAuth() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Set up auth state listener
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        // Only synchronous state updates here to avoid deadlocks
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
-          await checkAdminStatus(session.user.id);
+          // Keep loading until role check completes
+          setLoading(true);
+          setTimeout(() => {
+            checkAdminStatus(session.user.id).finally(() => {
+              setLoading(false);
+            });
+          }, 0);
         } else {
           setIsAdmin(false);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
-        await checkAdminStatus(session.user.id);
+        setLoading(true);
+        // Safe to call directly here (not inside callback), but we still
+        // ensure loading reflects the role check lifecycle
+        checkAdminStatus(session.user.id).finally(() => {
+          setLoading(false);
+        });
+      } else {
+        setIsAdmin(false);
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
