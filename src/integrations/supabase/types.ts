@@ -40,28 +40,43 @@ export type Database = {
       }
       clan_members: {
         Row: {
+          batch: string | null
           clan_id: string
           created_at: string | null
+          email: string | null
+          gender: string | null
           id: string
           name: string
           profile_image: string | null
+          reg_num: string | null
           updated_at: string | null
+          year: number | null
         }
         Insert: {
+          batch?: string | null
           clan_id: string
           created_at?: string | null
+          email?: string | null
+          gender?: string | null
           id?: string
           name: string
           profile_image?: string | null
+          reg_num?: string | null
           updated_at?: string | null
+          year?: number | null
         }
         Update: {
+          batch?: string | null
           clan_id?: string
           created_at?: string | null
+          email?: string | null
+          gender?: string | null
           id?: string
           name?: string
           profile_image?: string | null
+          reg_num?: string | null
           updated_at?: string | null
+          year?: number | null
         }
         Relationships: [
           {
@@ -75,37 +90,46 @@ export type Database = {
       }
       clans: {
         Row: {
+          bg_image: string | null
           color: string
           created_at: string | null
+          display_order: number | null
           id: string
           logo: string
           mascot: string
           name: string
           rank: number | null
+          sub_color: string | null
           tagline: string
           total_points: number | null
           updated_at: string | null
         }
         Insert: {
+          bg_image?: string | null
           color: string
           created_at?: string | null
+          display_order?: number | null
           id?: string
           logo: string
           mascot: string
           name: string
           rank?: number | null
+          sub_color?: string | null
           tagline: string
           total_points?: number | null
           updated_at?: string | null
         }
         Update: {
+          bg_image?: string | null
           color?: string
           created_at?: string | null
+          display_order?: number | null
           id?: string
           logo?: string
           mascot?: string
           name?: string
           rank?: number | null
+          sub_color?: string | null
           tagline?: string
           total_points?: number | null
           updated_at?: string | null

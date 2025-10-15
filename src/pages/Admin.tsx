@@ -12,6 +12,7 @@ import AdminAnnouncements from '@/components/admin/AdminAnnouncements';
 import AdminHighlights from '@/components/admin/AdminHighlights';
 import AdminClanMembers from '@/components/admin/AdminClanMembers';
 import AdminTeamRosters from '@/components/admin/AdminTeamRosters';
+import { AdminCSVImport } from '@/components/admin/AdminCSVImport';
 
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
@@ -51,20 +52,25 @@ export default function Admin() {
           </CardHeader>
         </Card>
 
-        <Tabs defaultValue="clans" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="clans">Clans</TabsTrigger>
-            <TabsTrigger value="members">Members</TabsTrigger>
-            <TabsTrigger value="rosters">Rosters</TabsTrigger>
-            <TabsTrigger value="sports">Sports</TabsTrigger>
-            <TabsTrigger value="matches">Matches</TabsTrigger>
-            <TabsTrigger value="announcements">Announcements</TabsTrigger>
-            <TabsTrigger value="highlights">Highlights</TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="import" className="w-full">
+            <TabsList className="grid w-full grid-cols-8">
+              <TabsTrigger value="import">Import CSV</TabsTrigger>
+              <TabsTrigger value="clans">Clans</TabsTrigger>
+              <TabsTrigger value="members">Members</TabsTrigger>
+              <TabsTrigger value="rosters">Rosters</TabsTrigger>
+              <TabsTrigger value="sports">Sports</TabsTrigger>
+              <TabsTrigger value="matches">Matches</TabsTrigger>
+              <TabsTrigger value="announcements">Announcements</TabsTrigger>
+              <TabsTrigger value="highlights">Highlights</TabsTrigger>
+            </TabsList>
           
-          <TabsContent value="clans">
-            <AdminClans />
-          </TabsContent>
+            <TabsContent value="import">
+              <AdminCSVImport />
+            </TabsContent>
+
+            <TabsContent value="clans">
+              <AdminClans />
+            </TabsContent>
           
           <TabsContent value="members">
             <AdminClanMembers />
