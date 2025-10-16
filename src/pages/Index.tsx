@@ -69,7 +69,7 @@ export default function Index() {
       
       {/* Hero Section */}
       <section 
-        className="relative h-[500px] bg-cover bg-center flex items-center justify-center"
+        className="relative min-h-screen bg-cover bg-center flex items-center justify-center"
         style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${heroBanner})` }}
       >
         <div className="text-center space-y-6 px-4 animate-fade-in">
@@ -183,7 +183,13 @@ export default function Index() {
                     <span className="text-2xl font-bold text-muted-foreground w-8">
                       {index + 1}
                     </span>
-                    <span className="text-3xl">{clan.logo}</span>
+                    <span className="text-3xl">
+                      {clan.logo && clan.logo.startsWith('http') ? (
+                        <img src={clan.logo} alt={clan.name} className="h-8 w-8 object-contain" />
+                      ) : (
+                        clan.logo
+                      )}
+                    </span>
                     <div>
                       <div className="font-semibold">{clan.name}</div>
                       <div className="text-xs text-muted-foreground">{clan.tagline}</div>

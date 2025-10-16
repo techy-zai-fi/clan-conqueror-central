@@ -101,7 +101,11 @@ export default function Leaderboard() {
                           className="text-5xl md:text-6xl p-3 rounded-xl"
                           style={{ backgroundColor: `${clan.color}20` }}
                         >
-                          {clan.logo}
+                          {clan.logo && clan.logo.startsWith('http') ? (
+                            <img src={clan.logo} alt={clan.name} className="h-12 w-12 object-contain" />
+                          ) : (
+                            clan.logo
+                          )}
                         </div>
                         <div className="flex-1">
                           <h3 className="text-xl md:text-2xl font-bold text-foreground">

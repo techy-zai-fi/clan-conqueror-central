@@ -64,7 +64,7 @@ export default function Auth() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl text-center">Clash of Clans</CardTitle>
-          <CardDescription className="text-center">Sign in with your IIM Bangalore account</CardDescription>
+          <CardDescription className="text-center">Sign in with your IIM Bodh Gaya account</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
           <Button 
