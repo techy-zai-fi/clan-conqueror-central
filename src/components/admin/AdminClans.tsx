@@ -10,6 +10,7 @@ import { Plus, Edit, Trash2 } from 'lucide-react';
 
 interface Clan {
   id: string;
+  clan_code: string | null;
   name: string;
   tagline: string;
   color: string;
@@ -28,6 +29,7 @@ export default function AdminClans() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClan, setEditingClan] = useState<Clan | null>(null);
   const [formData, setFormData] = useState({
+    clan_code: '',
     name: '',
     tagline: '',
     color: '#000000',
@@ -108,6 +110,7 @@ export default function AdminClans() {
 
   const resetForm = () => {
     setFormData({
+      clan_code: '',
       name: '',
       tagline: '',
       color: '#000000',
@@ -125,6 +128,7 @@ export default function AdminClans() {
   const openEditDialog = (clan: Clan) => {
     setEditingClan(clan);
     setFormData({
+      clan_code: clan.clan_code || '',
       name: clan.name,
       tagline: clan.tagline,
       color: clan.color,
@@ -157,6 +161,17 @@ export default function AdminClans() {
               <DialogTitle>{editingClan ? 'Edit Clan' : 'Add New Clan'}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="clan_code">Clan Code (2 characters)</Label>
+                <Input
+                  id="clan_code"
+                  value={formData.clan_code}
+                  onChange={(e) => setFormData({ ...formData, clan_code: e.target.value.toUpperCase() })}
+                  maxLength={2}
+                  required
+                  placeholder="RD"
+                />
+              </div>
               <div>
                 <Label htmlFor="name">Name</Label>
                 <Input

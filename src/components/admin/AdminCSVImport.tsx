@@ -34,6 +34,7 @@ export function AdminCSVImport() {
       const { error } = await supabase
         .from('clans')
         .upsert({
+          clan_code: row.id, // Use id as clan_code (2-char)
           name: row.name,
           logo: row.logo_url,
           tagline: row.quote,
@@ -42,7 +43,7 @@ export function AdminCSVImport() {
           display_order: parseInt(row.display_order) || null,
           color: row.main_color,
           sub_color: row.sub_color,
-        });
+        }, { onConflict: 'clan_code' });
       
       if (error) {
         console.error('Error importing clan:', row.name, error);
@@ -55,18 +56,18 @@ export function AdminCSVImport() {
     const text = await file.text();
     const data = parseCSV(text, ';');
     
-    // First, get all clan IDs mapping
+    // First, get all clan codes mapping
     const { data: clans } = await supabase
       .from('clans')
-      .select('id, name');
+      .select('clan_code, name');
     
-    const clanMap = new Map(clans?.map(c => [c.id, c.id]) || []);
+    const clanMap = new Map(clans?.map(c => [c.clan_code, c.clan_code]) || []);
     
     for (const row of data) {
-      const clanId = row.clan; // This matches the clan.id from the CSV
+      const clanCode = row.clan; // This is the 2-char clan code from CSV
       
-      if (!clanMap.has(clanId)) {
-        console.warn(`Clan ${clanId} not found for member ${row.name}`);
+      if (!clanMap.has(clanCode)) {
+        console.warn(`Clan ${clanCode} not found for member ${row.name}`);
         continue;
       }
       
@@ -74,7 +75,7 @@ export function AdminCSVImport() {
         .from('clan_members')
         .upsert({
           reg_num: row.reg_num,
-          clan_id: clanId,
+          clan_id: clanCode, // Use the 2-char clan code
           name: row.name,
           email: row.email,
           gender: row.gender,

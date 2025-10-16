@@ -24,6 +24,7 @@ interface ClanMember {
 interface Clan {
   id: string;
   name: string;
+  clan_code: string | null;
 }
 
 export default function AdminClanMembers() {
@@ -66,7 +67,7 @@ export default function AdminClanMembers() {
   const fetchClans = async () => {
     const { data } = await supabase
       .from('clans')
-      .select('id, name')
+      .select('id, name, clan_code')
       .order('name');
     
     setClans(data || []);
@@ -175,8 +176,8 @@ export default function AdminClanMembers() {
                   </SelectTrigger>
                   <SelectContent>
                     {clans.map((clan) => (
-                      <SelectItem key={clan.id} value={clan.id}>
-                        {clan.name}
+                      <SelectItem key={clan.id} value={clan.clan_code || clan.id}>
+                        {clan.name} ({clan.clan_code || clan.id})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -255,7 +256,7 @@ export default function AdminClanMembers() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {members.map((member) => {
-          const clan = clans.find((c) => c.id === member.clan_id);
+          const clan = clans.find((c) => c.clan_code === member.clan_id || c.id === member.clan_id);
           return (
             <Card key={member.id}>
               <CardHeader>

@@ -84,13 +84,14 @@ export type Database = {
             columns: ["clan_id"]
             isOneToOne: false
             referencedRelation: "clans"
-            referencedColumns: ["id"]
+            referencedColumns: ["clan_code"]
           },
         ]
       }
       clans: {
         Row: {
           bg_image: string | null
+          clan_code: string | null
           color: string
           created_at: string | null
           display_order: number | null
@@ -106,6 +107,7 @@ export type Database = {
         }
         Insert: {
           bg_image?: string | null
+          clan_code?: string | null
           color: string
           created_at?: string | null
           display_order?: number | null
@@ -121,6 +123,7 @@ export type Database = {
         }
         Update: {
           bg_image?: string | null
+          clan_code?: string | null
           color?: string
           created_at?: string | null
           display_order?: number | null
