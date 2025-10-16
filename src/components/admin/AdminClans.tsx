@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload } from 'lucide-react';
 
 interface Clan {
   id: string;
@@ -28,6 +28,7 @@ export default function AdminClans() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClan, setEditingClan] = useState<Clan | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [formData, setFormData] = useState({
     clan_code: '',
     name: '',
@@ -59,6 +60,47 @@ export default function AdminClans() {
       toast.error('Error loading clans');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be less than 2MB');
+      return;
+    }
+
+    try {
+      setUploadingLogo(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('clan-logos')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('clan-logos')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, logo: publicUrl });
+      toast.success('Logo uploaded successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Error uploading logo');
+    } finally {
+      setUploadingLogo(false);
     }
   };
 
@@ -201,13 +243,41 @@ export default function AdminClans() {
                 />
               </div>
               <div>
-                <Label htmlFor="logo">Logo (emoji or text)</Label>
-                <Input
-                  id="logo"
-                  value={formData.logo}
-                  onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
-                  required
-                />
+                <Label htmlFor="logo">Logo</Label>
+                <div className="space-y-2">
+                  {formData.logo && (
+                    <div className="flex items-center gap-2">
+                      {formData.logo.startsWith('http') ? (
+                        <img src={formData.logo} alt="Logo preview" className="h-12 w-12 object-contain" />
+                      ) : (
+                        <span className="text-2xl">{formData.logo}</span>
+                      )}
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Input
+                      id="logo"
+                      value={formData.logo}
+                      onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
+                      placeholder="Emoji or text"
+                    />
+                    <Label htmlFor="logo-file" className="cursor-pointer">
+                      <Button type="button" variant="outline" disabled={uploadingLogo} asChild>
+                        <span>
+                          <Upload className="h-4 w-4 mr-2" />
+                          {uploadingLogo ? 'Uploading...' : 'Upload'}
+                        </span>
+                      </Button>
+                    </Label>
+                    <Input
+                      id="logo-file"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
               </div>
               <div>
                 <Label htmlFor="mascot">Mascot</Label>
@@ -278,7 +348,14 @@ export default function AdminClans() {
           <Card key={clan.id}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span>{clan.logo} {clan.name}</span>
+                <span className="flex items-center gap-2">
+                  {clan.logo.startsWith('http') ? (
+                    <img src={clan.logo} alt={clan.name} className="h-8 w-8 object-contain" />
+                  ) : (
+                    <span>{clan.logo}</span>
+                  )}
+                  {clan.name}
+                </span>
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => openEditDialog(clan)}>
                     <Edit className="h-4 w-4" />
