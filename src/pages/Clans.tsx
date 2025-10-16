@@ -104,7 +104,13 @@ export default function Clans() {
                     background: `linear-gradient(135deg, ${clan.color}20 0%, transparent 100%)`
                   }}
                 >
-                  <div className="text-7xl mb-4">{clan.logo}</div>
+                  <div className="text-7xl mb-4">
+                    {clan.logo.startsWith('http') ? (
+                      <img src={clan.logo} alt={clan.name} className="h-20 w-20 object-contain mx-auto" />
+                    ) : (
+                      clan.logo
+                    )}
+                  </div>
                   <CardTitle className="text-2xl mb-2">{clan.name}</CardTitle>
                   <p className="text-sm text-muted-foreground italic">"{clan.tagline}"</p>
                   {clan.rank && (

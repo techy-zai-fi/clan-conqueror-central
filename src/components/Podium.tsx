@@ -60,7 +60,13 @@ export default function Podium() {
           <div className="absolute -top-4 bg-secondary border-2 border-border rounded-full p-2">
             <Medal className="h-6 w-6 text-zinc-400" />
           </div>
-          <div className="text-6xl mb-3">{second.logo}</div>
+          <div className="text-6xl mb-3">
+            {second.logo.startsWith('http') ? (
+              <img src={second.logo} alt={second.name} className="h-16 w-16 object-contain" />
+            ) : (
+              second.logo
+            )}
+          </div>
           <h3 className="text-lg font-bold text-center mb-1">{second.name}</h3>
           <p className="text-3xl font-bold text-foreground mb-2">{second.total_points}</p>
           <div className="w-20 h-32 bg-gradient-to-t from-zinc-400/30 to-transparent rounded-t-lg" />
@@ -78,7 +84,13 @@ export default function Podium() {
           <div className="absolute -top-5 bg-gradient-to-br from-accent to-yellow-500 border-2 border-accent rounded-full p-3 animate-pulse-glow">
             <Trophy className="h-8 w-8 text-background" />
           </div>
-          <div className="text-7xl mb-4">{first.logo}</div>
+          <div className="text-7xl mb-4">
+            {first.logo.startsWith('http') ? (
+              <img src={first.logo} alt={first.name} className="h-20 w-20 object-contain" />
+            ) : (
+              first.logo
+            )}
+          </div>
           <h3 className="text-xl font-bold text-center mb-2">{first.name}</h3>
           <p className="text-4xl font-bold text-accent mb-3">{first.total_points}</p>
           <div className="w-24 h-48 bg-gradient-to-t from-accent/40 via-accent/20 to-transparent rounded-t-lg" />
@@ -97,7 +109,13 @@ export default function Podium() {
           <div className="absolute -top-4 bg-secondary border-2 border-border rounded-full p-2">
             <Medal className="h-6 w-6 text-amber-700" />
           </div>
-          <div className="text-6xl mb-3">{third.logo}</div>
+          <div className="text-6xl mb-3">
+            {third.logo.startsWith('http') ? (
+              <img src={third.logo} alt={third.name} className="h-16 w-16 object-contain" />
+            ) : (
+              third.logo
+            )}
+          </div>
           <h3 className="text-lg font-bold text-center mb-1">{third.name}</h3>
           <p className="text-3xl font-bold text-foreground mb-2">{third.total_points}</p>
           <div className="w-20 h-24 bg-gradient-to-t from-amber-700/30 to-transparent rounded-t-lg" />
