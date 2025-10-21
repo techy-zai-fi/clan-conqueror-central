@@ -26,6 +26,7 @@ interface ClanMember {
 interface Clan {
   id: string;
   name: string;
+  clan_code: string | null;
 }
 
 interface TeamMember {
@@ -70,7 +71,7 @@ export default function AdminTeamRosters() {
   const fetchClans = async () => {
     const { data } = await supabase
       .from('clans')
-      .select('id, name');
+      .select('id, name, clan_code');
     setClans(data || []);
   };
 
@@ -137,7 +138,13 @@ export default function AdminTeamRosters() {
 
   const getClanMembers = () => {
     if (!selectedClan) return [];
-    return members.filter(m => m.clan_id === selectedClan);
+    const clan = clans.find(c => c.id === selectedClan);
+    // Match by clan_code or clan id
+    return members.filter(m => 
+      m.clan_id === selectedClan || 
+      m.clan_id === clan?.clan_code ||
+      m.clan_id === clan?.id
+    );
   };
 
   const getMatchClans = () => {
