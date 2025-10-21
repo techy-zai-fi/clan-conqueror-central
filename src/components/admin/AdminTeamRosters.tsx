@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2 } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Plus, Trash2, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 
@@ -45,6 +47,7 @@ export default function AdminTeamRosters() {
   const [selectedMatch, setSelectedMatch] = useState('');
   const [selectedClan, setSelectedClan] = useState('');
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -140,11 +143,20 @@ export default function AdminTeamRosters() {
     if (!selectedClan) return [];
     const clan = clans.find(c => c.id === selectedClan);
     // Match by clan_code or clan id
-    return members.filter(m => 
+    let filteredMembers = members.filter(m => 
       m.clan_id === selectedClan || 
       m.clan_id === clan?.clan_code ||
       m.clan_id === clan?.id
     );
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      filteredMembers = filteredMembers.filter(m => 
+        m.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return filteredMembers;
   };
 
   const getMatchClans = () => {
@@ -206,21 +218,38 @@ export default function AdminTeamRosters() {
                 {selectedClan && (
                   <div className="space-y-2">
                     <Label>Select Members</Label>
-                    {getClanMembers().map((member) => (
-                      <div key={member.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          checked={selectedMembers.includes(member.id)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedMembers([...selectedMembers, member.id]);
-                            } else {
-                              setSelectedMembers(selectedMembers.filter(id => id !== member.id));
-                            }
-                          }}
-                        />
-                        <label className="text-sm">{member.name}</label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search members..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-9"
+                      />
+                    </div>
+                    <ScrollArea className="h-[300px] border rounded-md p-4">
+                      <div className="space-y-2">
+                        {getClanMembers().length === 0 ? (
+                          <p className="text-sm text-muted-foreground">No members found</p>
+                        ) : (
+                          getClanMembers().map((member) => (
+                            <div key={member.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                checked={selectedMembers.includes(member.id)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedMembers([...selectedMembers, member.id]);
+                                  } else {
+                                    setSelectedMembers(selectedMembers.filter(id => id !== member.id));
+                                  }
+                                }}
+                              />
+                              <label className="text-sm cursor-pointer">{member.name}</label>
+                            </div>
+                          ))
+                        )}
                       </div>
-                    ))}
+                    </ScrollArea>
                   </div>
                 )}
 
