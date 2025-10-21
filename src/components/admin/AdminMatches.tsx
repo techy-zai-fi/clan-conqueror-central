@@ -8,8 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, CalendarIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, CalendarIcon, Trophy } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -36,6 +37,14 @@ export default function AdminMatches() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [scoreDialogOpen, setScoreDialogOpen] = useState(false);
+  const [scoringMatch, setScoringMatch] = useState<Match | null>(null);
+  const [scoreData, setScoreData] = useState({
+    score1: 0,
+    score2: 0,
+    status: 'live' as 'live' | 'completed',
+    winner: '',
+  });
   const [formData, setFormData] = useState({
     sport_id: '',
     sport_name: '',
@@ -141,6 +150,46 @@ export default function AdminMatches() {
     }
   };
 
+  const handleScoreUpdate = async () => {
+    if (!scoringMatch) return;
+
+    try {
+      const { error } = await supabase
+        .from('matches')
+        .update({
+          score1: scoreData.score1,
+          score2: scoreData.score2,
+          status: scoreData.status,
+          winner: scoreData.status === 'completed' ? scoreData.winner : null,
+        })
+        .eq('id', scoringMatch.id);
+
+      if (error) throw error;
+
+      if (scoreData.status === 'completed' && scoreData.winner) {
+        await updateClanPoints(scoreData.winner);
+      }
+
+      toast.success('Score updated successfully');
+      setScoreDialogOpen(false);
+      setScoringMatch(null);
+      fetchMatches();
+    } catch (error: any) {
+      toast.error('Error updating score');
+    }
+  };
+
+  const openScoreDialog = (match: Match) => {
+    setScoringMatch(match);
+    setScoreData({
+      score1: match.score1 || 0,
+      score2: match.score2 || 0,
+      status: match.status === 'upcoming' ? 'live' : match.status,
+      winner: match.winner || '',
+    });
+    setScoreDialogOpen(true);
+  };
+
   const updateClanPoints = async (winnerName: string) => {
     try {
       const { data: clan } = await supabase
@@ -222,213 +271,184 @@ export default function AdminMatches() {
     setDialogOpen(true);
   };
 
-  if (loading) return <p>Loading matches...</p>;
-
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Manage Matches</h2>
-        <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Match
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{editingMatch ? 'Edit Match' : 'Add New Match'}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="sport">Sport</Label>
-                <Select
-                  value={formData.sport_id}
-                  onValueChange={(value) => {
-                    const sport = sports.find(s => s.id === value);
-                    setFormData({ ...formData, sport_id: value, sport_name: sport?.name || '' });
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a sport" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sports.map((sport) => (
-                      <SelectItem key={sport.id} value={sport.id}>
-                        {sport.icon} {sport.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="clan1">Clan 1</Label>
-                <Select
-                  value={formData.clan1}
-                  onValueChange={(value) => setFormData({ ...formData, clan1: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select clan 1" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clans.map((clan) => (
-                      <SelectItem key={clan.id} value={clan.name}>
-                        {clan.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="clan2">Clan 2</Label>
-                <Select
-                  value={formData.clan2}
-                  onValueChange={(value) => setFormData({ ...formData, clan2: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select clan 2" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clans.map((clan) => (
-                      <SelectItem key={clan.id} value={clan.name}>
-                        {clan.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="date">Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => {
-                        setSelectedDate(date);
-                        if (date) {
-                          setFormData({ ...formData, date: format(date, "PPP") });
-                        }
-                      }}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div>
-                <Label htmlFor="time">Time</Label>
-                <Input
-                  id="time"
-                  type="time"
-                  value={formData.time}
-                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="venue">Venue</Label>
-                <Input
-                  id="venue"
-                  value={formData.venue}
-                  onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value: any) => setFormData({ ...formData, status: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="upcoming">Upcoming</SelectItem>
-                    <SelectItem value="live">Live</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {formData.status !== 'upcoming' && (
-                <>
-                  <div>
-                    <Label htmlFor="score1">Score Clan 1</Label>
-                    <Input
-                      id="score1"
-                      type="number"
-                      value={formData.score1}
-                      onChange={(e) => setFormData({ ...formData, score1: parseInt(e.target.value) })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="score2">Score Clan 2</Label>
-                    <Input
-                      id="score2"
-                      type="number"
-                      value={formData.score2}
-                      onChange={(e) => setFormData({ ...formData, score2: parseInt(e.target.value) })}
-                    />
-                  </div>
-                </>
-              )}
-              {formData.status === 'completed' && (
-                <div>
-                  <Label htmlFor="winner">Winner</Label>
-                  <Input
-                    id="winner"
-                    value={formData.winner}
-                    onChange={(e) => setFormData({ ...formData, winner: e.target.value })}
-                  />
-                </div>
-              )}
-              <Button type="submit" className="w-full">
-                {editingMatch ? 'Update Match' : 'Create Match'}
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+      <Tabs defaultValue="matches" className="w-full">
+        <TabsList>
+          <TabsTrigger value="matches">Manage Matches</TabsTrigger>
+          <TabsTrigger value="scores">Update Scores</TabsTrigger>
+        </TabsList>
 
-      <div className="grid gap-4">
-        {matches.map((match) => (
-          <Card key={match.id}>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>{match.sport_name}: {match.clan1} vs {match.clan2}</span>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => openEditDialog(match)}>
-                    <Edit className="h-4 w-4" />
+        <TabsContent value="matches" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">Manage Matches</h2>
+            <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Match
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>{editingMatch ? 'Edit Match' : 'Add New Match'}</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+...
+                  <Button type="submit" className="w-full">
+                    {editingMatch ? 'Update Match' : 'Create Match'}
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleDelete(match.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="grid gap-4">
+            {matches.map((match) => (
+              <Card key={match.id}>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>{match.sport_name}: {match.clan1} vs {match.clan2}</span>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => openEditDialog(match)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDelete(match.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">Date: {match.date} at {match.time}</p>
+                  <p className="text-sm">Venue: {match.venue}</p>
+                  <p className="text-sm">Status: {match.status}</p>
+                  {match.score1 !== null && <p className="text-sm">Score: {match.score1} - {match.score2}</p>}
+                  {match.winner && <p className="text-sm">Winner: {match.winner}</p>}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="scores" className="space-y-4">
+          <h2 className="text-2xl font-bold">Update Match Scores</h2>
+          
+          <Dialog open={scoreDialogOpen} onOpenChange={setScoreDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  Update Score: {scoringMatch?.clan1} vs {scoringMatch?.clan2}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>{scoringMatch?.clan1} Score</Label>
+                    <Input
+                      type="number"
+                      value={scoreData.score1}
+                      onChange={(e) => setScoreData({ ...scoreData, score1: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                  <div>
+                    <Label>{scoringMatch?.clan2} Score</Label>
+                    <Input
+                      type="number"
+                      value={scoreData.score2}
+                      onChange={(e) => setScoreData({ ...scoreData, score2: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
                 </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm">Date: {match.date} at {match.time}</p>
-              <p className="text-sm">Venue: {match.venue}</p>
-              <p className="text-sm">Status: {match.status}</p>
-              {match.score1 !== null && <p className="text-sm">Score: {match.score1} - {match.score2}</p>}
-              {match.winner && <p className="text-sm">Winner: {match.winner}</p>}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+
+                <div>
+                  <Label>Match Status</Label>
+                  <Select
+                    value={scoreData.status}
+                    onValueChange={(value: any) => setScoreData({ ...scoreData, status: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="live">Live</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {scoreData.status === 'completed' && (
+                  <div>
+                    <Label>Winner</Label>
+                    <Select
+                      value={scoreData.winner}
+                      onValueChange={(value) => setScoreData({ ...scoreData, winner: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select winner" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={scoringMatch?.clan1 || ''}>
+                          {scoringMatch?.clan1}
+                        </SelectItem>
+                        <SelectItem value={scoringMatch?.clan2 || ''}>
+                          {scoringMatch?.clan2}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <Button onClick={handleScoreUpdate} className="w-full">
+                  Update Score
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <div className="grid gap-4">
+            {matches.filter(m => m.status !== 'completed').map((match) => (
+              <Card key={match.id}>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div>
+                      <p className="text-lg">{match.sport_name}</p>
+                      <p className="text-sm font-normal text-muted-foreground">
+                        {match.date} at {match.time}
+                      </p>
+                    </div>
+                    <Button onClick={() => openScoreDialog(match)} size="sm">
+                      <Trophy className="h-4 w-4 mr-2" />
+                      Update Score
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-center flex-1">
+                      <p className="font-bold text-lg">{match.clan1}</p>
+                      <p className="text-3xl font-bold mt-2">{match.score1 ?? '-'}</p>
+                    </div>
+                    <div className="text-2xl font-bold text-muted-foreground mx-4">VS</div>
+                    <div className="text-center flex-1">
+                      <p className="font-bold text-lg">{match.clan2}</p>
+                      <p className="text-3xl font-bold mt-2">{match.score2 ?? '-'}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 text-center">
+                    <span className={cn(
+                      "px-3 py-1 rounded-full text-sm font-medium",
+                      match.status === 'live' ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"
+                    )}>
+                      {match.status.toUpperCase()}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
