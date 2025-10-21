@@ -6,8 +6,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface Match {
   id: string;
@@ -27,9 +31,11 @@ interface Match {
 export default function AdminMatches() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [sports, setSports] = useState<any[]>([]);
+  const [clans, setClans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>();
   const [formData, setFormData] = useState({
     sport_id: '',
     sport_name: '',
@@ -47,6 +53,7 @@ export default function AdminMatches() {
   useEffect(() => {
     fetchMatches();
     fetchSports();
+    fetchClans();
   }, []);
 
   const fetchMatches = async () => {
@@ -75,6 +82,20 @@ export default function AdminMatches() {
       setSports(data || []);
     } catch (error: any) {
       toast.error('Error loading sports');
+    }
+  };
+
+  const fetchClans = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('clans')
+        .select('id, name, clan_code')
+        .order('name');
+
+      if (error) throw error;
+      setClans(data || []);
+    } catch (error: any) {
+      toast.error('Error loading clans');
     }
   };
 
@@ -170,6 +191,7 @@ export default function AdminMatches() {
       score2: 0,
       winner: '',
     });
+    setSelectedDate(undefined);
     setEditingMatch(null);
   };
 
@@ -188,6 +210,15 @@ export default function AdminMatches() {
       score2: match.score2 || 0,
       winner: match.winner || '',
     });
+    // Try to parse the existing date if it's in a recognizable format
+    try {
+      const parsedDate = new Date(match.date);
+      if (!isNaN(parsedDate.getTime())) {
+        setSelectedDate(parsedDate);
+      }
+    } catch (e) {
+      setSelectedDate(undefined);
+    }
     setDialogOpen(true);
   };
 
@@ -232,39 +263,78 @@ export default function AdminMatches() {
               </div>
               <div>
                 <Label htmlFor="clan1">Clan 1</Label>
-                <Input
-                  id="clan1"
+                <Select
                   value={formData.clan1}
-                  onChange={(e) => setFormData({ ...formData, clan1: e.target.value })}
-                  required
-                />
+                  onValueChange={(value) => setFormData({ ...formData, clan1: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select clan 1" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clans.map((clan) => (
+                      <SelectItem key={clan.id} value={clan.name}>
+                        {clan.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="clan2">Clan 2</Label>
-                <Input
-                  id="clan2"
+                <Select
                   value={formData.clan2}
-                  onChange={(e) => setFormData({ ...formData, clan2: e.target.value })}
-                  required
-                />
+                  onValueChange={(value) => setFormData({ ...formData, clan2: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select clan 2" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clans.map((clan) => (
+                      <SelectItem key={clan.id} value={clan.name}>
+                        {clan.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="date">Date</Label>
-                <Input
-                  id="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  placeholder="e.g., Feb 2, 2025"
-                  required
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => {
+                        setSelectedDate(date);
+                        if (date) {
+                          setFormData({ ...formData, date: format(date, "PPP") });
+                        }
+                      }}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div>
                 <Label htmlFor="time">Time</Label>
                 <Input
                   id="time"
+                  type="time"
                   value={formData.time}
                   onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  placeholder="e.g., 3:00 PM"
                   required
                 />
               </div>
