@@ -88,6 +88,47 @@ export type Database = {
           },
         ]
       }
+      clan_panchs: {
+        Row: {
+          clan_id: string
+          created_at: string | null
+          display_order: number
+          id: string
+          image_url: string | null
+          name: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          clan_id: string
+          created_at?: string | null
+          display_order: number
+          id?: string
+          image_url?: string | null
+          name: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          clan_id?: string
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          name?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clan_panchs_clan_id_fkey"
+            columns: ["clan_id"]
+            isOneToOne: false
+            referencedRelation: "clans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clans: {
         Row: {
           bg_image: string | null
