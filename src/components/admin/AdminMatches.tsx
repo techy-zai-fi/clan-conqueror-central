@@ -294,7 +294,179 @@ export default function AdminMatches() {
                   <DialogTitle>{editingMatch ? 'Edit Match' : 'Add New Match'}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-...
+                  <div>
+                    <Label>Sport</Label>
+                    <Select
+                      value={formData.sport_id}
+                      onValueChange={(value) => {
+                        const sport = sports.find(s => s.id === value);
+                        setFormData({ 
+                          ...formData, 
+                          sport_id: value,
+                          sport_name: sport?.name || ''
+                        });
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select sport" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sports.map((sport) => (
+                          <SelectItem key={sport.id} value={sport.id}>
+                            {sport.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Clan 1</Label>
+                      <Select
+                        value={formData.clan1}
+                        onValueChange={(value) => setFormData({ ...formData, clan1: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select clan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {clans.map((clan) => (
+                            <SelectItem key={clan.id} value={clan.name}>
+                              {clan.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label>Clan 2</Label>
+                      <Select
+                        value={formData.clan2}
+                        onValueChange={(value) => setFormData({ ...formData, clan2: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select clan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {clans.map((clan) => (
+                            <SelectItem key={clan.id} value={clan.name}>
+                              {clan.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !selectedDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={(date) => {
+                            setSelectedDate(date);
+                            if (date) {
+                              setFormData({ ...formData, date: format(date, "yyyy-MM-dd") });
+                            }
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div>
+                    <Label>Time</Label>
+                    <Input
+                      type="time"
+                      value={formData.time}
+                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Venue</Label>
+                    <Input
+                      value={formData.venue}
+                      onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                      placeholder="Match venue"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Status</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value: any) => setFormData({ ...formData, status: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="upcoming">Upcoming</SelectItem>
+                        <SelectItem value="live">Live</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {formData.status !== 'upcoming' && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>{formData.clan1} Score</Label>
+                        <Input
+                          type="number"
+                          value={formData.score1}
+                          onChange={(e) => setFormData({ ...formData, score1: parseInt(e.target.value) || 0 })}
+                        />
+                      </div>
+                      <div>
+                        <Label>{formData.clan2} Score</Label>
+                        <Input
+                          type="number"
+                          value={formData.score2}
+                          onChange={(e) => setFormData({ ...formData, score2: parseInt(e.target.value) || 0 })}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {formData.status === 'completed' && (
+                    <div>
+                      <Label>Winner</Label>
+                      <Select
+                        value={formData.winner}
+                        onValueChange={(value) => setFormData({ ...formData, winner: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select winner" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={formData.clan1}>{formData.clan1}</SelectItem>
+                          <SelectItem value={formData.clan2}>{formData.clan2}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
                   <Button type="submit" className="w-full">
                     {editingMatch ? 'Update Match' : 'Create Match'}
                   </Button>
