@@ -14,6 +14,7 @@ import AdminClanMembers from '@/components/admin/AdminClanMembers';
 import AdminTeamRosters from '@/components/admin/AdminTeamRosters';
 import { AdminCSVImport } from '@/components/admin/AdminCSVImport';
 import AdminSiteSettings from '@/components/admin/AdminSiteSettings';
+import AdminClanPanchs from '@/components/admin/AdminClanPanchs';
 
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
@@ -54,10 +55,11 @@ export default function Admin() {
         </Card>
 
           <Tabs defaultValue="import" className="w-full">
-            <TabsList className="grid w-full grid-cols-9">
+            <TabsList className="grid w-full grid-cols-10">
               <TabsTrigger value="import">Import CSV</TabsTrigger>
               <TabsTrigger value="settings">Site</TabsTrigger>
               <TabsTrigger value="clans">Clans</TabsTrigger>
+              <TabsTrigger value="panchs">Panchs</TabsTrigger>
               <TabsTrigger value="members">Members</TabsTrigger>
               <TabsTrigger value="rosters">Rosters</TabsTrigger>
               <TabsTrigger value="sports">Sports</TabsTrigger>
@@ -76,6 +78,10 @@ export default function Admin() {
 
             <TabsContent value="clans">
               <AdminClans />
+            </TabsContent>
+
+            <TabsContent value="panchs">
+              <AdminClanPanchs />
             </TabsContent>
           
           <TabsContent value="members">
