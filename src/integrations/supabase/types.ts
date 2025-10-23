@@ -243,6 +243,33 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          logo_url: string | null
+          site_name: string
+          site_subtitle: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          logo_url?: string | null
+          site_name?: string
+          site_subtitle?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          logo_url?: string | null
+          site_name?: string
+          site_subtitle?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       sport_team_members: {
         Row: {
           clan_id: string

@@ -7,6 +7,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -21,16 +23,52 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
+  const [siteSettings, setSiteSettings] = useState({
+    logo_url: null as string | null,
+    site_name: 'Clash of Clans',
+    site_subtitle: 'IIM Bodh Gaya 2025',
+  });
+
+  useEffect(() => {
+    fetchSiteSettings();
+  }, []);
+
+  const fetchSiteSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data) {
+        setSiteSettings({
+          logo_url: data.logo_url,
+          site_name: data.site_name || 'Clash of Clans',
+          site_subtitle: data.site_subtitle || 'IIM Bodh Gaya 2025',
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching site settings:', error);
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2 transition-transform hover:scale-105">
-            <Trophy className="h-8 w-8 text-accent" />
+            {siteSettings.logo_url ? (
+              <img src={siteSettings.logo_url} alt="Logo" className="h-8 w-8 object-contain" />
+            ) : (
+              <Trophy className="h-8 w-8 text-accent" />
+            )}
             <div className="flex flex-col">
-              <span className="text-lg font-bold text-foreground">Clash of Clans</span>
-              <span className="text-xs text-muted-foreground">IIM Bodh Gaya 2025</span>
+              <span className="text-lg font-bold text-foreground">{siteSettings.site_name}</span>
+              {siteSettings.site_subtitle && (
+                <span className="text-xs text-muted-foreground">{siteSettings.site_subtitle}</span>
+              )}
             </div>
           </Link>
 
