@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Podium from '@/components/Podium';
 import UpcomingMatches from '@/components/UpcomingMatches';
 import AnnouncementsBanner from '@/components/AnnouncementsBanner';
+import Sponsors from '@/components/Sponsors';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Trophy, Users, Calendar, TrendingUp } from 'lucide-react';
@@ -236,6 +237,9 @@ export default function Index() {
             </CardContent>
           </Card>
         </section>
+
+        {/* Sponsors Section */}
+        <Sponsors />
       </div>
     </div>
   );
