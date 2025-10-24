@@ -37,6 +37,9 @@ interface TeamMember {
   clan_id: string;
   member_id: string;
   member_name?: string;
+  updated_by?: string;
+  updated_at?: string;
+  updater_email?: string;
 }
 
 export default function AdminTeamRosters() {
@@ -88,12 +91,24 @@ export default function AdminTeamRosters() {
   const fetchTeamMembers = async (matchId: string) => {
     const { data } = await supabase
       .from('sport_team_members')
-      .select('id, match_id, clan_id, member_id');
+      .select('id, match_id, clan_id, member_id, updated_by, updated_at');
     
     if (data) {
+      // Fetch updater emails
+      const updaterIds = [...new Set(data.map(tm => tm.updated_by).filter(Boolean))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .in('id', updaterIds);
+      
       const enriched = data.map(tm => {
         const member = members.find(m => m.id === tm.member_id);
-        return { ...tm, member_name: member?.name };
+        const updater = profiles?.find(p => p.id === tm.updated_by);
+        return { 
+          ...tm, 
+          member_name: member?.name,
+          updater_email: updater?.email 
+        };
       });
       setTeamMembers(enriched.filter(tm => tm.match_id === matchId));
     }
@@ -272,20 +287,32 @@ export default function AdminTeamRosters() {
                     {clanTeam.length === 0 ? (
                       <p className="text-sm text-muted-foreground">No members added</p>
                     ) : (
-                      <ul className="space-y-2">
-                        {clanTeam.map((tm) => (
-                          <li key={tm.id} className="flex justify-between items-center">
-                            <span>{tm.member_name}</span>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleRemove(tm.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="space-y-4">
+                        <ul className="space-y-2">
+                          {clanTeam.map((tm) => (
+                            <li key={tm.id} className="flex justify-between items-center">
+                              <span>{tm.member_name}</span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleRemove(tm.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </li>
+                          ))}
+                        </ul>
+                        {clanTeam[0]?.updated_by && (
+                          <div className="text-xs text-muted-foreground pt-2 border-t">
+                            Last updated by: {clanTeam[0].updater_email || 'Unknown'}
+                            {clanTeam[0].updated_at && (
+                              <span className="block">
+                                {new Date(clanTeam[0].updated_at).toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     )}
                   </CardContent>
                 </Card>

@@ -16,6 +16,12 @@ interface Panch {
   title: string;
   image_url: string | null;
   display_order: number;
+  user_id: string | null;
+}
+
+interface User {
+  id: string;
+  email: string;
 }
 
 interface Clan {
@@ -26,6 +32,7 @@ interface Clan {
 export default function AdminClanPanchs() {
   const [panchs, setPanchs] = useState<Panch[]>([]);
   const [clans, setClans] = useState<Clan[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editingPanch, setEditingPanch] = useState<Panch | null>(null);
@@ -35,6 +42,7 @@ export default function AdminClanPanchs() {
     title: "",
     image_url: "",
     display_order: 1,
+    user_id: "",
   });
 
   useEffect(() => {
@@ -43,16 +51,19 @@ export default function AdminClanPanchs() {
 
   const fetchData = async () => {
     try {
-      const [panchsRes, clansRes] = await Promise.all([
+      const [panchsRes, clansRes, usersRes] = await Promise.all([
         supabase.from("clan_panchs").select("*").order("clan_id").order("display_order"),
         supabase.from("clans").select("id, name").order("name"),
+        supabase.from("profiles").select("id, email"),
       ]);
 
       if (panchsRes.error) throw panchsRes.error;
       if (clansRes.error) throw clansRes.error;
+      if (usersRes.error) throw usersRes.error;
 
       setPanchs(panchsRes.data || []);
       setClans(clansRes.data || []);
+      setUsers(usersRes.data || []);
     } catch (error: any) {
       toast.error("Failed to fetch data: " + error.message);
     } finally {
@@ -96,6 +107,7 @@ export default function AdminClanPanchs() {
             title: formData.title,
             image_url: formData.image_url || null,
             display_order: formData.display_order,
+            user_id: formData.user_id || null,
           })
           .eq("id", editingPanch.id);
 
@@ -109,6 +121,7 @@ export default function AdminClanPanchs() {
             title: formData.title,
             image_url: formData.image_url || null,
             display_order: formData.display_order,
+            user_id: formData.user_id || null,
           },
         ]);
 
@@ -144,6 +157,7 @@ export default function AdminClanPanchs() {
       title: "",
       image_url: "",
       display_order: 1,
+      user_id: "",
     });
     setEditingPanch(null);
   };
@@ -156,6 +170,7 @@ export default function AdminClanPanchs() {
       title: panch.title,
       image_url: panch.image_url || "",
       display_order: panch.display_order,
+      user_id: panch.user_id || "",
     });
     setOpen(true);
   };
@@ -275,6 +290,29 @@ export default function AdminClanPanchs() {
                     className="hidden"
                   />
                 </div>
+              </div>
+
+              <div>
+                <Label>Link to User Account (Optional)</Label>
+                <Select
+                  value={formData.user_id}
+                  onValueChange={(value) => setFormData({ ...formData, user_id: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select user account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">None</SelectItem>
+                    {users.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Link this panch to a user account to allow them to edit team rosters
+                </p>
               </div>
 
               <Button type="submit" className="w-full">

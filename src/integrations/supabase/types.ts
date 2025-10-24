@@ -98,6 +98,7 @@ export type Database = {
           name: string
           title: string
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           clan_id: string
@@ -108,6 +109,7 @@ export type Database = {
           name: string
           title: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           clan_id?: string
@@ -118,6 +120,7 @@ export type Database = {
           name?: string
           title?: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -348,6 +351,8 @@ export type Database = {
           id: string
           match_id: string
           member_id: string
+          updated_at: string | null
+          updated_by: string | null
         }
         Insert: {
           clan_id: string
@@ -355,6 +360,8 @@ export type Database = {
           id?: string
           match_id: string
           member_id: string
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Update: {
           clan_id?: string
@@ -362,6 +369,8 @@ export type Database = {
           id?: string
           match_id?: string
           member_id?: string
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -439,6 +448,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_panch_for_clan: {
+        Args: { _clan_id: string; _user_id: string }
         Returns: boolean
       }
     }
