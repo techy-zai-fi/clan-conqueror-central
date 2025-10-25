@@ -6,6 +6,7 @@ import Podium from '@/components/Podium';
 import UpcomingMatches from '@/components/UpcomingMatches';
 import AnnouncementsBanner from '@/components/AnnouncementsBanner';
 import Sponsors from '@/components/Sponsors';
+import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Trophy, Users, Calendar, TrendingUp } from 'lucide-react';
@@ -241,6 +242,9 @@ export default function Index() {
         {/* Sponsors Section */}
         <Sponsors />
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
