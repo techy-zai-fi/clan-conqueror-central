@@ -89,15 +89,15 @@ export default function Clans() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {clans.map((clan, index) => (
-              <Card 
-                key={clan.id}
-                className="h-full hover:scale-105 transition-all duration-300 cursor-pointer animate-scale-in border-2"
-                style={{ 
-                  animationDelay: `${index * 0.1}s`,
-                  borderColor: clan.color,
-                  boxShadow: `0 0 30px ${clan.color}40`
-                }}
-              >
+              <Link key={clan.id} to={`/clans/${clan.id}`}>
+                <Card 
+                  className="h-full hover:scale-105 transition-all duration-300 cursor-pointer animate-scale-in border-2"
+                  style={{ 
+                    animationDelay: `${index * 0.1}s`,
+                    borderColor: clan.color,
+                    boxShadow: `0 0 30px ${clan.color}40`
+                  }}
+                >
                 <CardHeader 
                   className="text-center pb-4"
                   style={{
@@ -173,6 +173,7 @@ export default function Clans() {
                   </div>
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         )}

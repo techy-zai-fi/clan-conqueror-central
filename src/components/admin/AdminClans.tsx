@@ -18,6 +18,7 @@ interface Clan {
   logo: string;
   mascot: string;
   bg_image: string | null;
+  video_url: string | null;
   display_order: number | null;
   total_points: number;
   rank: number | null;
@@ -38,6 +39,7 @@ export default function AdminClans() {
     logo: '',
     mascot: '',
     bg_image: '',
+    video_url: '',
     display_order: 1,
     total_points: 0,
     rank: 1,
@@ -160,6 +162,7 @@ export default function AdminClans() {
       logo: '',
       mascot: '',
       bg_image: '',
+      video_url: '',
       display_order: 1,
       total_points: 0,
       rank: 1,
@@ -178,6 +181,7 @@ export default function AdminClans() {
       logo: clan.logo,
       mascot: clan.mascot,
       bg_image: clan.bg_image || '',
+      video_url: clan.video_url || '',
       display_order: clan.display_order || 1,
       total_points: clan.total_points,
       rank: clan.rank || 1,
@@ -305,6 +309,18 @@ export default function AdminClans() {
                   onChange={(e) => setFormData({ ...formData, bg_image: e.target.value })}
                   placeholder="https://..."
                 />
+              </div>
+              <div>
+                <Label htmlFor="video_url">Intro Video URL (YouTube embed)</Label>
+                <Input
+                  id="video_url"
+                  value={formData.video_url}
+                  onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                  placeholder="https://www.youtube.com/embed/..."
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Use the embed URL format from YouTube
+                </p>
               </div>
               <div>
                 <Label htmlFor="display_order">Display Order</Label>
