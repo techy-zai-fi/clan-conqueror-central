@@ -7,7 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Trash2, Edit, Plus, Upload } from "lucide-react";
+import { Trash2, Edit, Plus, Upload, Search } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Panch {
   id: string;
@@ -17,6 +19,14 @@ interface Panch {
   image_url: string | null;
   display_order: number;
   user_id: string | null;
+  member_id: string | null;
+}
+
+interface ClanMember {
+  id: string;
+  name: string;
+  clan_id: string;
+  email: string | null;
 }
 
 interface User {
@@ -27,17 +37,21 @@ interface User {
 interface Clan {
   id: string;
   name: string;
+  clan_code: string | null;
 }
 
 export default function AdminClanPanchs() {
   const [panchs, setPanchs] = useState<Panch[]>([]);
   const [clans, setClans] = useState<Clan[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [clanMembers, setClanMembers] = useState<ClanMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editingPanch, setEditingPanch] = useState<Panch | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     clan_id: "",
+    member_id: "",
     name: "",
     title: "",
     image_url: "",
@@ -51,19 +65,22 @@ export default function AdminClanPanchs() {
 
   const fetchData = async () => {
     try {
-      const [panchsRes, clansRes, usersRes] = await Promise.all([
+      const [panchsRes, clansRes, usersRes, membersRes] = await Promise.all([
         supabase.from("clan_panchs").select("*").order("clan_id").order("display_order"),
-        supabase.from("clans").select("id, name").order("name"),
+        supabase.from("clans").select("id, name, clan_code").order("name"),
         supabase.from("profiles").select("id, email"),
+        supabase.from("clan_members").select("id, name, clan_id, email"),
       ]);
 
       if (panchsRes.error) throw panchsRes.error;
       if (clansRes.error) throw clansRes.error;
       if (usersRes.error) throw usersRes.error;
+      if (membersRes.error) throw membersRes.error;
 
       setPanchs(panchsRes.data || []);
       setClans(clansRes.data || []);
       setUsers(usersRes.data || []);
+      setClanMembers(membersRes.data || []);
     } catch (error: any) {
       toast.error("Failed to fetch data: " + error.message);
     } finally {
@@ -103,6 +120,7 @@ export default function AdminClanPanchs() {
         const { error } = await supabase
           .from("clan_panchs")
           .update({
+            member_id: formData.member_id || null,
             name: formData.name,
             title: formData.title,
             image_url: formData.image_url || null,
@@ -117,6 +135,7 @@ export default function AdminClanPanchs() {
         const { error } = await supabase.from("clan_panchs").insert([
           {
             clan_id: formData.clan_id,
+            member_id: formData.member_id || null,
             name: formData.name,
             title: formData.title,
             image_url: formData.image_url || null,
@@ -153,12 +172,14 @@ export default function AdminClanPanchs() {
   const resetForm = () => {
     setFormData({
       clan_id: "",
+      member_id: "",
       name: "",
       title: "",
       image_url: "",
       display_order: 1,
       user_id: "",
     });
+    setSearchQuery('');
     setEditingPanch(null);
   };
 
@@ -166,6 +187,7 @@ export default function AdminClanPanchs() {
     setEditingPanch(panch);
     setFormData({
       clan_id: panch.clan_id,
+      member_id: panch.member_id || "",
       name: panch.name,
       title: panch.title,
       image_url: panch.image_url || "",
@@ -173,6 +195,36 @@ export default function AdminClanPanchs() {
       user_id: panch.user_id || "",
     });
     setOpen(true);
+  };
+
+  const getClanMembers = () => {
+    if (!formData.clan_id) return [];
+    const clan = clans.find(c => c.id === formData.clan_id);
+    let filteredMembers = clanMembers.filter(m => 
+      m.clan_id === formData.clan_id || 
+      m.clan_id === clan?.clan_code ||
+      m.clan_id === clan?.id
+    );
+    
+    if (searchQuery.trim()) {
+      filteredMembers = filteredMembers.filter(m => 
+        m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (m.email && m.email.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
+    
+    return filteredMembers;
+  };
+
+  const handleMemberSelect = (memberId: string) => {
+    const member = clanMembers.find(m => m.id === memberId);
+    if (member) {
+      setFormData({ 
+        ...formData, 
+        member_id: memberId,
+        name: member.name,
+      });
+    }
   };
 
   if (loading) return <div>Loading...</div>;
@@ -228,14 +280,51 @@ export default function AdminClanPanchs() {
                 </Select>
               </div>
 
-              <div>
-                <Label>Name</Label>
-                <Input
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
+              {formData.clan_id && (
+                <div className="space-y-2">
+                  <Label>Select Member from Clan</Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search members by name or email..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9"
+                    />
+                  </div>
+                  <ScrollArea className="h-[200px] border rounded-md p-4">
+                    <div className="space-y-2">
+                      {getClanMembers().length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No members found</p>
+                      ) : (
+                        getClanMembers().map((member) => (
+                          <div key={member.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              checked={formData.member_id === member.id}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  handleMemberSelect(member.id);
+                                }
+                              }}
+                            />
+                            <label className="text-sm cursor-pointer flex-1">
+                              {member.name}
+                              {member.email && (
+                                <span className="text-muted-foreground ml-2">({member.email})</span>
+                              )}
+                            </label>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
+                  {formData.member_id && (
+                    <p className="text-sm text-muted-foreground">
+                      Selected: {formData.name}
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <Label>Title/Role</Label>

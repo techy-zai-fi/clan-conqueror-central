@@ -95,6 +95,7 @@ export type Database = {
           display_order: number
           id: string
           image_url: string | null
+          member_id: string | null
           name: string
           title: string
           updated_at: string | null
@@ -106,6 +107,7 @@ export type Database = {
           display_order: number
           id?: string
           image_url?: string | null
+          member_id?: string | null
           name: string
           title: string
           updated_at?: string | null
@@ -117,6 +119,7 @@ export type Database = {
           display_order?: number
           id?: string
           image_url?: string | null
+          member_id?: string | null
           name?: string
           title?: string
           updated_at?: string | null
@@ -128,6 +131,13 @@ export type Database = {
             columns: ["clan_id"]
             isOneToOne: false
             referencedRelation: "clans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clan_panchs_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "clan_members"
             referencedColumns: ["id"]
           },
         ]
