@@ -107,7 +107,7 @@ export default function AdminClanPanchs() {
             title: formData.title,
             image_url: formData.image_url || null,
             display_order: formData.display_order,
-            user_id: formData.user_id || null,
+            user_id: formData.user_id === 'none' ? null : formData.user_id || null,
           })
           .eq("id", editingPanch.id);
 
@@ -121,7 +121,7 @@ export default function AdminClanPanchs() {
             title: formData.title,
             image_url: formData.image_url || null,
             display_order: formData.display_order,
-            user_id: formData.user_id || null,
+            user_id: formData.user_id === 'none' ? null : formData.user_id || null,
           },
         ]);
 
@@ -302,7 +302,7 @@ export default function AdminClanPanchs() {
                     <SelectValue placeholder="Select user account" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {users.map((user) => (
                       <SelectItem key={user.id} value={user.id}>
                         {user.email}
