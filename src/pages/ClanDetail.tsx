@@ -84,7 +84,7 @@ export default function ClanDetail() {
         <Button 
           variant="outline" 
           onClick={() => navigate('/clans')}
-          className="mb-6"
+          className="mb-4 md:mb-6 w-full sm:w-auto"
           style={{ 
             borderColor: clan.color,
             color: clan.color,
@@ -96,7 +96,7 @@ export default function ClanDetail() {
 
         {/* Hero Section */}
         <div 
-          className="relative rounded-2xl overflow-hidden mb-8 p-8 md:p-16 text-white"
+          className="relative rounded-xl md:rounded-2xl overflow-hidden mb-6 md:mb-8 p-6 md:p-16 text-white"
           style={{
             backgroundColor: clan.color,
             backgroundImage: clan.bg_image ? `url(${clan.bg_image})` : 'none',
@@ -108,22 +108,22 @@ export default function ClanDetail() {
             <img 
               src={clan.logo} 
               alt={clan.name}
-              className="w-32 h-32 md:w-48 md:h-48 mx-auto mb-6 object-contain drop-shadow-2xl"
+              className="w-24 h-24 md:w-32 lg:w-48 md:h-32 lg:h-48 mx-auto mb-4 md:mb-6 object-contain drop-shadow-2xl"
             />
-            <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">{clan.name}</h1>
-            <p className="text-xl md:text-2xl mb-4 drop-shadow-lg">{clan.tagline}</p>
-            <p className="text-lg drop-shadow-lg">Mascot: {clan.mascot}</p>
-            <div className="mt-6">
-              <span className="text-3xl font-bold drop-shadow-lg">Total Points: {clan.total_points}</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 drop-shadow-lg">{clan.name}</h1>
+            <p className="text-lg sm:text-xl md:text-2xl mb-3 md:mb-4 drop-shadow-lg">{clan.tagline}</p>
+            <p className="text-base md:text-lg drop-shadow-lg">Mascot: {clan.mascot}</p>
+            <div className="mt-4 md:mt-6">
+              <span className="text-2xl md:text-3xl font-bold drop-shadow-lg">Total Points: {clan.total_points}</span>
             </div>
           </div>
         </div>
 
         {/* Intro Video Section */}
         {clan.video_url && (
-          <Card className="mb-8" style={{ borderColor: clan.color }}>
-            <CardContent className="p-6">
-              <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: clan.color }}>
+          <Card className="mb-6 md:mb-8" style={{ borderColor: clan.color }}>
+            <CardContent className="p-4 md:p-6">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center" style={{ color: clan.color }}>
                 Clan Introduction
               </h2>
               <div className="aspect-video rounded-lg overflow-hidden">
@@ -142,35 +142,35 @@ export default function ClanDetail() {
         {/* Panchs Section */}
         {panchs.length > 0 && (
           <Card style={{ borderColor: clan.color }}>
-            <CardContent className="p-6">
-              <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: clan.color }}>
+            <CardContent className="p-4 md:p-6">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center" style={{ color: clan.color }}>
                 Clan Leaders (Panchs)
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-6">
                 {panchs.map((panch) => (
                   <Card 
                     key={panch.id}
                     className="text-center hover:shadow-lg transition-shadow"
                     style={{ borderColor: clan.color }}
                   >
-                    <CardContent className="p-6">
+                    <CardContent className="p-3 md:p-6">
                       {panch.image_url ? (
                         <img
                           src={panch.image_url}
                           alt={panch.name}
-                          className="w-24 h-24 mx-auto mb-4 rounded-full object-cover"
+                          className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-2 md:mb-4 rounded-full object-cover"
                           style={{ border: `3px solid ${clan.color}` }}
                         />
                       ) : (
                         <div 
-                          className="w-24 h-24 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl font-bold text-white"
+                          className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-2 md:mb-4 rounded-full flex items-center justify-center text-lg md:text-2xl font-bold text-white"
                           style={{ backgroundColor: clan.color }}
                         >
                           {panch.name.charAt(0)}
                         </div>
                       )}
-                      <h3 className="font-bold text-lg mb-1">{panch.name}</h3>
-                      <p className="text-sm text-muted-foreground">{panch.title}</p>
+                      <h3 className="font-bold text-sm md:text-lg mb-1">{panch.name}</h3>
+                      <p className="text-xs md:text-sm text-muted-foreground">{panch.title}</p>
                     </CardContent>
                   </Card>
                 ))}

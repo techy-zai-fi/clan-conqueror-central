@@ -47,22 +47,23 @@ export default function Sports() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
           {sports.map((sport, index) => (
             <Link key={sport.id} to={`/sports/${sport.id}`}>
               <Card 
                 className="h-full hover:scale-105 transition-all duration-300 cursor-pointer animate-scale-in bg-gradient-to-br from-card to-secondary/20 border-2 border-border hover:border-primary/50"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <CardHeader className="text-center pb-6">
-                  <div className="text-8xl mb-4">{sport.icon}</div>
-                  <CardTitle className="text-3xl">{sport.name}</CardTitle>
-                  <p className="text-muted-foreground italic mt-2">{sport.description}</p>
+                <CardHeader className="text-center pb-4 md:pb-6 p-4 md:p-6">
+                  <div className="text-5xl md:text-8xl mb-2 md:mb-4">{sport.icon}</div>
+                  <CardTitle className="text-xl md:text-3xl">{sport.name}</CardTitle>
+                  <p className="text-sm md:text-base text-muted-foreground italic mt-1 md:mt-2">{sport.description}</p>
                 </CardHeader>
                 
-                <CardContent>
-                  <Button className="w-full group" variant="outline">
-                    View Schedule & Results
+                <CardContent className="p-4 md:p-6 pt-0">
+                  <Button className="w-full group text-sm md:text-base" variant="outline">
+                    <span className="hidden sm:inline">View Schedule & Results</span>
+                    <span className="sm:hidden">View Details</span>
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </CardContent>

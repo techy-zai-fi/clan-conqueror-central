@@ -80,46 +80,46 @@ export default function Leaderboard() {
                   boxShadow: isTop3 ? `0 0 30px ${clan.color}40` : 'none'
                 }}
               >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 md:gap-6 flex-1">
+                <CardContent className="p-3 md:p-6">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-2 md:gap-6 flex-1 min-w-0">
                       {/* Rank */}
-                      <div className="flex flex-col items-center min-w-[60px]">
+                      <div className="flex flex-col items-center min-w-[40px] md:min-w-[60px]">
                         {isTop3 ? (
-                          <div className="mb-2">{icons[index]}</div>
+                          <div className="mb-1 md:mb-2">{icons[index]}</div>
                         ) : (
-                          <div className="text-3xl font-bold text-muted-foreground mb-2">
+                          <div className="text-2xl md:text-3xl font-bold text-muted-foreground mb-1 md:mb-2">
                             {index + 1}
                           </div>
                         )}
-                        <span className="text-xs text-muted-foreground">RANK</span>
+                        <span className="text-[10px] md:text-xs text-muted-foreground">RANK</span>
                       </div>
 
                       {/* Clan Info */}
-                      <div className="flex items-center gap-4 flex-1">
+                      <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
                         <div 
-                          className="text-5xl md:text-6xl p-3 rounded-xl"
+                          className="text-3xl md:text-5xl lg:text-6xl p-2 md:p-3 rounded-xl flex-shrink-0"
                           style={{ backgroundColor: `${clan.color}20` }}
                         >
                           {clan.logo && clan.logo.startsWith('http') ? (
-                            <img src={clan.logo} alt={clan.name} className="h-12 w-12 object-contain" />
+                            <img src={clan.logo} alt={clan.name} className="h-8 md:h-12 w-8 md:w-12 object-contain" />
                           ) : (
                             clan.logo
                           )}
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-xl md:text-2xl font-bold text-foreground">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm sm:text-lg md:text-2xl font-bold text-foreground truncate">
                             {clan.name}
                           </h3>
-                          <p className="text-sm text-muted-foreground italic mt-1">
+                          <p className="text-xs md:text-sm text-muted-foreground italic mt-1 line-clamp-1">
                             {clan.tagline}
                           </p>
-                          <div className="flex items-center gap-2 mt-2">
+                          <div className="flex items-center gap-2 mt-1 md:mt-2">
                             <div 
-                              className="w-4 h-4 rounded-full"
+                              className="w-3 md:w-4 h-3 md:h-4 rounded-full flex-shrink-0"
                               style={{ backgroundColor: clan.color }}
                             />
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-[10px] md:text-xs text-muted-foreground truncate">
                               {clan.mascot}
                             </span>
                           </div>
@@ -127,11 +127,11 @@ export default function Leaderboard() {
                       </div>
 
                       {/* Points */}
-                      <div className="flex flex-col items-center min-w-[100px]">
-                        <div className="text-4xl font-bold text-accent mb-1">
+                      <div className="flex flex-col items-center min-w-[60px] md:min-w-[100px]">
+                        <div className="text-2xl md:text-4xl font-bold text-accent mb-1">
                           {clan.total_points}
                         </div>
-                        <span className="text-xs text-muted-foreground">POINTS</span>
+                        <span className="text-[10px] md:text-xs text-muted-foreground">POINTS</span>
                       </div>
                     </div>
                   </div>

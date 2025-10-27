@@ -60,20 +60,20 @@ export default function Announcements() {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardHeader>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 flex-1">
+                <div className="flex items-start justify-between gap-2 md:gap-4 flex-wrap">
+                  <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
                     {announcement.urgent ? (
-                      <AlertCircle className="h-6 w-6 text-destructive mt-1" />
+                      <AlertCircle className="h-5 md:h-6 w-5 md:w-6 text-destructive mt-1 flex-shrink-0" />
                     ) : (
-                      <Megaphone className="h-6 w-6 text-primary mt-1" />
+                      <Megaphone className="h-5 md:h-6 w-5 md:w-6 text-primary mt-1 flex-shrink-0" />
                     )}
-                    <div>
-                      <CardTitle className="text-2xl mb-2">{announcement.title}</CardTitle>
-                      <p className="text-foreground leading-relaxed">{announcement.message}</p>
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="text-lg md:text-2xl mb-2">{announcement.title}</CardTitle>
+                      <p className="text-sm md:text-base text-foreground leading-relaxed">{announcement.message}</p>
                     </div>
                   </div>
                   {announcement.urgent && (
-                    <Badge variant="destructive" className="text-sm px-3 py-1">
+                    <Badge variant="destructive" className="text-xs md:text-sm px-2 md:px-3 py-1 flex-shrink-0">
                       URGENT
                     </Badge>
                   )}

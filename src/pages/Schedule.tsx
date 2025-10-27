@@ -60,18 +60,18 @@ export default function Schedule() {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-2xl flex items-center gap-2">
-                    <span className="text-4xl">{match.sport_name === 'Cricket' ? '🏏' : match.sport_name === 'Football' ? '⚽' : match.sport_name === 'Basketball' ? '🏀' : '🏐'}</span>
-                    {match.sport_name}
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <CardTitle className="text-lg sm:text-xl md:text-2xl flex items-center gap-2">
+                    <span className="text-2xl md:text-4xl">{match.sport_name === 'Cricket' ? '🏏' : match.sport_name === 'Football' ? '⚽' : match.sport_name === 'Basketball' ? '🏀' : '🏐'}</span>
+                    <span className="hidden sm:inline">{match.sport_name}</span>
                   </CardTitle>
                   {match.status === 'live' && (
-                    <Badge variant="destructive" className="animate-pulse text-lg px-4 py-1">
+                    <Badge variant="destructive" className="animate-pulse text-sm md:text-lg px-3 md:px-4 py-1">
                       LIVE
                     </Badge>
                   )}
                   {match.status === 'upcoming' && (
-                    <Badge variant="secondary" className="text-lg px-4 py-1">
+                    <Badge variant="secondary" className="text-sm md:text-lg px-3 md:px-4 py-1">
                       Upcoming
                     </Badge>
                   )}
@@ -80,20 +80,20 @@ export default function Schedule() {
               
               <CardContent className="space-y-4">
                 {/* Teams */}
-                <div className="flex items-center justify-center gap-6 py-4">
+                <div className="flex items-center justify-center gap-3 md:gap-6 py-4">
                   <div className="text-center flex-1">
-                    <div className="text-2xl font-bold text-foreground">{match.clan1}</div>
+                    <div className="text-base sm:text-lg md:text-2xl font-bold text-foreground">{match.clan1}</div>
                     {match.status === 'live' && (
-                      <div className="text-3xl font-bold text-accent mt-2">{match.score1}</div>
+                      <div className="text-2xl md:text-3xl font-bold text-accent mt-2">{match.score1}</div>
                     )}
                   </div>
                   
-                  <div className="text-3xl font-bold text-muted-foreground">VS</div>
+                  <div className="text-xl md:text-3xl font-bold text-muted-foreground">VS</div>
                   
                   <div className="text-center flex-1">
-                    <div className="text-2xl font-bold text-foreground">{match.clan2}</div>
+                    <div className="text-base sm:text-lg md:text-2xl font-bold text-foreground">{match.clan2}</div>
                     {match.status === 'live' && (
-                      <div className="text-3xl font-bold text-accent mt-2">{match.score2}</div>
+                      <div className="text-2xl md:text-3xl font-bold text-accent mt-2">{match.score2}</div>
                     )}
                   </div>
                 </div>

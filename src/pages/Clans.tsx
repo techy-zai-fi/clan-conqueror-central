@@ -87,7 +87,7 @@ export default function Clans() {
             <p>No clans available yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
             {clans.map((clan, index) => (
               <Link key={clan.id} to={`/clans/${clan.id}`}>
                 <Card 
@@ -99,23 +99,23 @@ export default function Clans() {
                   }}
                 >
                 <CardHeader 
-                  className="text-center pb-4"
+                  className="text-center pb-3 md:pb-4 p-4 md:p-6"
                   style={{
                     background: `linear-gradient(135deg, ${clan.color}20 0%, transparent 100%)`
                   }}
                 >
-                  <div className="text-7xl mb-4">
+                  <div className="text-5xl md:text-7xl mb-3 md:mb-4">
                     {clan.logo.startsWith('http') ? (
-                      <img src={clan.logo} alt={clan.name} className="h-20 w-20 object-contain mx-auto" />
+                      <img src={clan.logo} alt={clan.name} className="h-16 md:h-20 w-16 md:w-20 object-contain mx-auto" />
                     ) : (
                       clan.logo
                     )}
                   </div>
-                  <CardTitle className="text-2xl mb-2">{clan.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground italic">"{clan.tagline}"</p>
+                  <CardTitle className="text-xl md:text-2xl mb-2">{clan.name}</CardTitle>
+                  <p className="text-xs md:text-sm text-muted-foreground italic">"{clan.tagline}"</p>
                   {clan.rank && (
                     <Badge 
-                      className="mt-3"
+                      className="mt-2 md:mt-3 text-xs md:text-sm"
                       style={{ backgroundColor: clan.color }}
                     >
                       Rank #{clan.rank}
@@ -123,38 +123,38 @@ export default function Clans() {
                   )}
                 </CardHeader>
                 
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/30">
-                    <div className="flex items-center gap-2">
-                      <Trophy className="h-5 w-5 text-accent" />
-                      <span className="font-medium">Total Points</span>
+                <CardContent className="space-y-3 md:space-y-4 p-4 md:p-6 pt-0">
+                  <div className="flex items-center justify-between p-2 md:p-3 rounded-lg bg-secondary/30">
+                    <div className="flex items-center gap-1 md:gap-2">
+                      <Trophy className="h-4 md:h-5 w-4 md:w-5 text-accent" />
+                      <span className="font-medium text-xs md:text-base">Total Points</span>
                     </div>
-                    <span className="text-2xl font-bold text-accent">{clan.total_points}</span>
+                    <span className="text-xl md:text-2xl font-bold text-accent">{clan.total_points}</span>
                   </div>
 
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-secondary/30">
-                    <Target className="h-5 w-5" style={{ color: clan.color }} />
-                    <span className="font-medium">Mascot:</span>
-                    <span className="text-muted-foreground">{clan.mascot}</span>
+                  <div className="flex items-center gap-1 md:gap-2 p-2 md:p-3 rounded-lg bg-secondary/30">
+                    <Target className="h-4 md:h-5 w-4 md:w-5" style={{ color: clan.color }} />
+                    <span className="font-medium text-xs md:text-base">Mascot:</span>
+                    <span className="text-muted-foreground text-xs md:text-base truncate">{clan.mascot}</span>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-secondary/30">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Users className="h-5 w-5" style={{ color: clan.color }} />
-                      <span className="font-medium">Team Members</span>
+                  <div className="p-2 md:p-3 rounded-lg bg-secondary/30">
+                    <div className="flex items-center gap-1 md:gap-2 mb-2 md:mb-3">
+                      <Users className="h-4 md:h-5 w-4 md:w-5" style={{ color: clan.color }} />
+                      <span className="font-medium text-xs md:text-base">Team Members</span>
                     </div>
                     {clanMembers[clan.id] && clanMembers[clan.id].length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 md:gap-2">
                         {clanMembers[clan.id].slice(0, 6).map((member) => (
-                          <div key={member.id} className="flex items-center gap-2 text-sm">
+                          <div key={member.id} className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
                             {member.profile_image ? (
                               <img 
                                 src={member.profile_image} 
                                 alt={member.name}
-                                className="w-6 h-6 rounded-full object-cover"
+                                className="w-5 md:w-6 h-5 md:h-6 rounded-full object-cover flex-shrink-0"
                               />
                             ) : (
-                              <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs">
+                              <div className="w-5 md:w-6 h-5 md:h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] md:text-xs flex-shrink-0">
                                 {member.name.charAt(0)}
                               </div>
                             )}
@@ -162,13 +162,13 @@ export default function Clans() {
                           </div>
                         ))}
                         {clanMembers[clan.id].length > 6 && (
-                          <span className="text-xs text-muted-foreground col-span-2">
+                          <span className="text-[10px] md:text-xs text-muted-foreground col-span-2">
                             +{clanMembers[clan.id].length - 6} more
                           </span>
                         )}
                       </div>
                     ) : (
-                      <span className="text-sm text-muted-foreground">No members yet</span>
+                      <span className="text-xs md:text-sm text-muted-foreground">No members yet</span>
                     )}
                   </div>
                 </CardContent>
