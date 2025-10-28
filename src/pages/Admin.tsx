@@ -16,6 +16,7 @@ import { AdminCSVImport } from '@/components/admin/AdminCSVImport';
 import AdminSiteSettings from '@/components/admin/AdminSiteSettings';
 import AdminClanPanchs from '@/components/admin/AdminClanPanchs';
 import AdminSponsors from '@/components/admin/AdminSponsors';
+import AdminFooterSettings from '@/components/admin/AdminFooterSettings';
 
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
@@ -56,7 +57,7 @@ export default function Admin() {
         </Card>
 
           <Tabs defaultValue="import" className="w-full">
-            <TabsList className="grid w-full grid-cols-11">
+            <TabsList className="grid w-full grid-cols-12">
               <TabsTrigger value="import">Import CSV</TabsTrigger>
               <TabsTrigger value="settings">Site</TabsTrigger>
               <TabsTrigger value="clans">Clans</TabsTrigger>
@@ -68,6 +69,7 @@ export default function Admin() {
               <TabsTrigger value="announcements">Announcements</TabsTrigger>
               <TabsTrigger value="highlights">Highlights</TabsTrigger>
               <TabsTrigger value="sponsors">Sponsors</TabsTrigger>
+              <TabsTrigger value="footer">Footer</TabsTrigger>
             </TabsList>
           
             <TabsContent value="import">
@@ -112,6 +114,10 @@ export default function Admin() {
 
           <TabsContent value="sponsors">
             <AdminSponsors />
+          </TabsContent>
+
+          <TabsContent value="footer">
+            <AdminFooterSettings />
           </TabsContent>
         </Tabs>
       </main>

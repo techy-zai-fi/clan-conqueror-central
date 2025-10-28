@@ -71,25 +71,25 @@ export default function Index() {
       
       {/* Hero Section */}
       <section 
-        className="relative min-h-[60vh] md:min-h-screen bg-cover bg-center flex items-center justify-center"
+        className="relative min-h-[70vh] sm:min-h-[80vh] lg:min-h-screen bg-cover bg-center flex items-center justify-center"
         style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${heroBanner})` }}
       >
-        <div className="text-center space-y-4 md:space-y-6 px-4 animate-fade-in">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-foreground">
+        <div className="text-center space-y-3 sm:space-y-4 md:space-y-6 px-4 animate-fade-in max-w-5xl mx-auto">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-foreground leading-tight">
             Clash of <span className="text-accent">Clans</span> 2025
           </h1>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto px-2">
             IIM Bodh Gaya's Premier Intra-College Sports Championship
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
-            <Link to="/leaderboard">
-              <Button size="lg" className="gap-2 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center pt-2">
+            <Link to="/leaderboard" className="w-full sm:w-auto">
+              <Button size="lg" className="gap-2 w-full">
                 <Trophy className="h-4 md:h-5 w-4 md:w-5" />
                 <span className="text-sm md:text-base">View Leaderboard</span>
               </Button>
             </Link>
-            <Link to="/schedule">
-              <Button size="lg" variant="secondary" className="gap-2 w-full sm:w-auto">
+            <Link to="/schedule" className="w-full sm:w-auto">
+              <Button size="lg" variant="secondary" className="gap-2 w-full">
                 <Calendar className="h-4 md:h-5 w-4 md:w-5" />
                 <span className="text-sm md:text-base">Match Schedule</span>
               </Button>

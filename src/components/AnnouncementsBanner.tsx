@@ -39,13 +39,13 @@ export default function AnnouncementsBanner() {
 
   return (
     <Alert variant="destructive" className="animate-slide-up border-2">
-      <AlertCircle className="h-5 w-5" />
-      <AlertTitle className="flex items-center gap-2">
-        <Megaphone className="h-4 w-4" />
-        Important Announcement
+      <AlertCircle className="h-5 w-5 flex-shrink-0" />
+      <AlertTitle className="flex items-center gap-2 flex-wrap">
+        <Megaphone className="h-4 w-4 flex-shrink-0" />
+        <span className="break-words">Important Announcement</span>
       </AlertTitle>
-      <AlertDescription>
-        <strong>{urgentAnnouncement.title}:</strong> {urgentAnnouncement.message}
+      <AlertDescription className="break-words">
+        <strong className="break-words">{urgentAnnouncement.title}:</strong> {urgentAnnouncement.message}
       </AlertDescription>
     </Alert>
   );

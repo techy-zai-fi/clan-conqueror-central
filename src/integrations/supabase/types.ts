@@ -196,6 +196,63 @@ export type Database = {
         }
         Relationships: []
       }
+      footer_settings: {
+        Row: {
+          about_text: string | null
+          address: string | null
+          company_name: string
+          contact_email: string | null
+          contact_phone: string | null
+          copyright_text: string | null
+          created_at: string
+          facebook_url: string | null
+          id: string
+          instagram_url: string | null
+          linkedin_url: string | null
+          show_newsletter: boolean | null
+          show_social_links: boolean | null
+          twitter_url: string | null
+          updated_at: string
+          youtube_url: string | null
+        }
+        Insert: {
+          about_text?: string | null
+          address?: string | null
+          company_name?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          copyright_text?: string | null
+          created_at?: string
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          show_newsletter?: boolean | null
+          show_social_links?: boolean | null
+          twitter_url?: string | null
+          updated_at?: string
+          youtube_url?: string | null
+        }
+        Update: {
+          about_text?: string | null
+          address?: string | null
+          company_name?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          copyright_text?: string | null
+          created_at?: string
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          show_newsletter?: boolean | null
+          show_social_links?: boolean | null
+          twitter_url?: string | null
+          updated_at?: string
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       highlights: {
         Row: {
           created_at: string | null
