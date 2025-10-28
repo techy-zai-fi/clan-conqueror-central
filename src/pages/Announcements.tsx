@@ -38,12 +38,13 @@ export default function Announcements() {
       <Navbar />
       
       <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 flex items-center justify-center gap-3">
-            <Megaphone className="h-10 w-10 text-accent" />
-            Important <span className="text-accent">Announcements</span>
+        <div className="text-center mb-8 md:mb-12 animate-fade-in px-2">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-foreground mb-3 md:mb-4 flex flex-wrap items-center justify-center gap-2 md:gap-3 leading-tight">
+            <Megaphone className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-accent flex-shrink-0" />
+            <span className="break-words">Important</span>
+            <span className="text-accent break-words">Announcements</span>
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-sm sm:text-base md:text-xl text-muted-foreground px-4">
             Stay updated with the latest news and updates
           </p>
         </div>
@@ -68,12 +69,12 @@ export default function Announcements() {
                       <Megaphone className="h-5 md:h-6 w-5 md:w-6 text-primary mt-1 flex-shrink-0" />
                     )}
                     <div className="min-w-0 flex-1">
-                      <CardTitle className="text-lg md:text-2xl mb-2">{announcement.title}</CardTitle>
-                      <p className="text-sm md:text-base text-foreground leading-relaxed">{announcement.message}</p>
+                      <CardTitle className="text-base sm:text-lg md:text-2xl mb-2 break-words">{announcement.title}</CardTitle>
+                      <p className="text-sm md:text-base text-foreground leading-relaxed break-words">{announcement.message}</p>
                     </div>
                   </div>
                   {announcement.urgent && (
-                    <Badge variant="destructive" className="text-xs md:text-sm px-2 md:px-3 py-1 flex-shrink-0">
+                    <Badge variant="destructive" className="text-xs md:text-sm px-2 md:px-3 py-1 flex-shrink-0 whitespace-nowrap">
                       URGENT
                     </Badge>
                   )}
@@ -81,9 +82,9 @@ export default function Announcements() {
               </CardHeader>
               
               <CardContent>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground flex-wrap">
+                  <Clock className="h-4 w-4 flex-shrink-0" />
+                  <span className="break-words">
                     {new Date(announcement.created_at).toLocaleString('en-IN', {
                       day: 'numeric',
                       month: 'long',
