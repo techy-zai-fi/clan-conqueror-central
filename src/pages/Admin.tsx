@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import Navbar from '@/components/Navbar';
@@ -18,9 +19,25 @@ import AdminClanPanchs from '@/components/admin/AdminClanPanchs';
 import AdminSponsors from '@/components/admin/AdminSponsors';
 import AdminFooterSettings from '@/components/admin/AdminFooterSettings';
 
+const adminTabs = [
+  { value: 'import', label: 'Import CSV' },
+  { value: 'settings', label: 'Site Settings' },
+  { value: 'clans', label: 'Clans' },
+  { value: 'panchs', label: 'Panchs' },
+  { value: 'members', label: 'Members' },
+  { value: 'rosters', label: 'Rosters' },
+  { value: 'sports', label: 'Sports' },
+  { value: 'matches', label: 'Matches' },
+  { value: 'announcements', label: 'Announcements' },
+  { value: 'highlights', label: 'Highlights' },
+  { value: 'sponsors', label: 'Sponsors' },
+  { value: 'footer', label: 'Footer' },
+];
+
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('import');
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -56,20 +73,30 @@ export default function Admin() {
           </CardHeader>
         </Card>
 
-          <Tabs defaultValue="import" className="w-full">
-            <TabsList className="grid w-full grid-cols-12">
-              <TabsTrigger value="import">Import CSV</TabsTrigger>
-              <TabsTrigger value="settings">Site</TabsTrigger>
-              <TabsTrigger value="clans">Clans</TabsTrigger>
-              <TabsTrigger value="panchs">Panchs</TabsTrigger>
-              <TabsTrigger value="members">Members</TabsTrigger>
-              <TabsTrigger value="rosters">Rosters</TabsTrigger>
-              <TabsTrigger value="sports">Sports</TabsTrigger>
-              <TabsTrigger value="matches">Matches</TabsTrigger>
-              <TabsTrigger value="announcements">Announcements</TabsTrigger>
-              <TabsTrigger value="highlights">Highlights</TabsTrigger>
-              <TabsTrigger value="sponsors">Sponsors</TabsTrigger>
-              <TabsTrigger value="footer">Footer</TabsTrigger>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            {/* Mobile Dropdown */}
+            <div className="md:hidden mb-4">
+              <Select value={activeTab} onValueChange={setActiveTab}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select section" />
+                </SelectTrigger>
+                <SelectContent>
+                  {adminTabs.map((tab) => (
+                    <SelectItem key={tab.value} value={tab.value}>
+                      {tab.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Desktop Tabs */}
+            <TabsList className="hidden md:grid w-full grid-cols-12">
+              {adminTabs.map((tab) => (
+                <TabsTrigger key={tab.value} value={tab.value}>
+                  {tab.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
           
             <TabsContent value="import">
