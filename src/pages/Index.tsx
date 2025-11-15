@@ -26,11 +26,16 @@ interface Highlight {
   description: string;
 }
 
+interface SiteSettings {
+  logo_url: string | null;
+}
+
 export default function Index() {
   const [clans, setClans] = useState<Clan[]>([]);
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [totalClans, setTotalClans] = useState(0);
   const [totalSports, setTotalSports] = useState(0);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -63,6 +68,15 @@ export default function Index() {
       .select('*', { count: 'exact', head: true });
     
     if (count) setTotalSports(count);
+
+    // Fetch site settings
+    const { data: settingsData } = await supabase
+      .from('site_settings')
+      .select('logo_url')
+      .limit(1)
+      .single();
+    
+    if (settingsData) setSiteSettings(settingsData);
   };
 
   return (
@@ -75,6 +89,15 @@ export default function Index() {
         style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${heroBanner})` }}
       >
         <div className="text-center space-y-3 sm:space-y-4 md:space-y-6 px-4 animate-fade-in max-w-5xl mx-auto">
+          {siteSettings?.logo_url && (
+            <div className="flex justify-center mb-4 md:mb-8">
+              <img 
+                src={siteSettings.logo_url} 
+                alt="Event Logo" 
+                className="h-24 sm:h-32 md:h-40 lg:h-48 w-auto object-contain"
+              />
+            </div>
+          )}
           <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-foreground leading-tight">
             Clash of <span className="text-accent">Clans</span> 2025
           </h1>
