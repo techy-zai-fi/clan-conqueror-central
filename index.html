@@ -29,6 +29,13 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      // Detect if app is running as a PWA (standalone) and set attribute on <html>
+      (function () {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        if (isStandalone) document.documentElement.setAttribute('data-pwa', 'true');
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

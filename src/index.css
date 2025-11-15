@@ -67,8 +67,28 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
+  /* Apply safe-area padding only when app is running as an installed PWA/standalone. */
+  html[data-pwa="true"] body {
     @apply bg-background text-foreground;
-    padding-top: env(safe-area-inset-top);
+    /* Respect device safe areas for PWAs (notably iOS home indicator and notch).
+       Add navbar height (4rem) so sticky navbar doesn't overlap content on phones. */
+    padding-top: calc(env(safe-area-inset-top, 0px) + 4rem);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    /* Add a small extra bottom padding so content doesn't butt against the home indicator */
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+  }
+
+  @media (display-mode: standalone) {
+    body {
+      @apply bg-background text-foreground;
+      /* Respect device safe areas for PWAs (notably iOS home indicator and notch).
+         Add navbar height (4rem) so sticky navbar doesn't overlap content on phones. */
+      padding-top: calc(env(safe-area-inset-top, 0px) + 4rem);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+      /* Add a small extra bottom padding so content doesn't butt against the home indicator */
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+    }
   }
 }
