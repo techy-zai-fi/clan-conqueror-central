@@ -86,7 +86,7 @@ export default function Index() {
       
       {/* Hero Section */}
       <section 
-        className="relative min-h-[70vh] sm:min-h-[80vh] lg:min-h-screen bg-cover bg-center flex items-start justify-center pt-12 md:pt-20"
+        className="relative min-h-[70vh] sm:min-h-[80vh] lg:min-h-screen bg-cover bg-center flex items-start justify-center pt-6 md:pt-10"
         style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${heroBanner})` }}
       >
         <div className="text-center space-y-3 sm:space-y-4 md:space-y-6 px-4 animate-fade-in max-w-5xl mx-auto">
@@ -95,7 +95,7 @@ export default function Index() {
               <img 
                 src={siteSettings.hero_logo_url} 
                 alt="Event Logo" 
-                className="h-24 sm:h-32 md:h-40 lg:h-48 w-auto object-contain rounded-2xl"
+                className="h-32 sm:h-40 md:h-52 lg:h-64 w-auto object-contain rounded-2xl"
               />
             </div>
           )}
