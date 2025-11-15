@@ -11,6 +11,7 @@ import { Upload, Link as LinkIcon, Save } from 'lucide-react';
 interface SiteSettings {
   id: string;
   logo_url: string | null;
+  hero_logo_url: string | null;
   site_name: string;
   site_subtitle: string | null;
 }
@@ -21,6 +22,7 @@ export default function AdminSiteSettings() {
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     logo_url: '',
+    hero_logo_url: '',
     site_name: '',
     site_subtitle: '',
   });
@@ -42,6 +44,7 @@ export default function AdminSiteSettings() {
       setSettings(data);
       setFormData({
         logo_url: data.logo_url || '',
+        hero_logo_url: data.hero_logo_url || '',
         site_name: data.site_name || '',
         site_subtitle: data.site_subtitle || '',
       });
@@ -52,14 +55,14 @@ export default function AdminSiteSettings() {
     }
   };
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'hero_logo_url') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       setUploading(true);
       const fileExt = file.name.split('.').pop();
-      const fileName = `logo-${Date.now()}.${fileExt}`;
+      const fileName = `${field}-${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -72,7 +75,7 @@ export default function AdminSiteSettings() {
         .from('clan-logos')
         .getPublicUrl(filePath);
 
-      setFormData({ ...formData, logo_url: publicUrl });
+      setFormData({ ...formData, [field]: publicUrl });
       toast.success('Logo uploaded successfully');
     } catch (error: any) {
       toast.error('Error uploading logo');
@@ -90,6 +93,7 @@ export default function AdminSiteSettings() {
           .from('site_settings')
           .update({
             logo_url: formData.logo_url || null,
+            hero_logo_url: formData.hero_logo_url || null,
             site_name: formData.site_name,
             site_subtitle: formData.site_subtitle || null,
           })
@@ -101,6 +105,7 @@ export default function AdminSiteSettings() {
           .from('site_settings')
           .insert([{
             logo_url: formData.logo_url || null,
+            hero_logo_url: formData.hero_logo_url || null,
             site_name: formData.site_name,
             site_subtitle: formData.site_subtitle || null,
           }]);
@@ -126,12 +131,12 @@ export default function AdminSiteSettings() {
     <Card>
       <CardHeader>
         <CardTitle>Site Settings</CardTitle>
-        <CardDescription>Manage navbar logo and text</CardDescription>
+        <CardDescription>Manage navbar logo, hero logo, and text</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            <Label>Site Logo</Label>
+            <Label>Navbar Logo</Label>
             <Tabs defaultValue="upload" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="upload">
@@ -149,7 +154,7 @@ export default function AdminSiteSettings() {
                   <Input
                     type="file"
                     accept="image/*"
-                    onChange={handleLogoUpload}
+                    onChange={(e) => handleLogoUpload(e, 'logo_url')}
                     disabled={uploading}
                   />
                   {uploading && <span className="text-sm text-muted-foreground">Uploading...</span>}
@@ -157,7 +162,7 @@ export default function AdminSiteSettings() {
                 {formData.logo_url && (
                   <div className="mt-4">
                     <p className="text-sm text-muted-foreground mb-2">Preview:</p>
-                    <img src={formData.logo_url} alt="Logo preview" className="h-16 w-16 object-contain" />
+                    <img src={formData.logo_url} alt="Navbar logo preview" className="h-16 w-16 object-contain" />
                   </div>
                 )}
               </TabsContent>
@@ -172,7 +177,56 @@ export default function AdminSiteSettings() {
                 {formData.logo_url && (
                   <div className="mt-4">
                     <p className="text-sm text-muted-foreground mb-2">Preview:</p>
-                    <img src={formData.logo_url} alt="Logo preview" className="h-16 w-16 object-contain" />
+                    <img src={formData.logo_url} alt="Navbar logo preview" className="h-16 w-16 object-contain" />
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <div className="space-y-4">
+            <Label>Hero Section Logo</Label>
+            <Tabs defaultValue="upload" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="upload">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Image
+                </TabsTrigger>
+                <TabsTrigger value="url">
+                  <LinkIcon className="h-4 w-4 mr-2" />
+                  Image URL
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="upload" className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleLogoUpload(e, 'hero_logo_url')}
+                    disabled={uploading}
+                  />
+                  {uploading && <span className="text-sm text-muted-foreground">Uploading...</span>}
+                </div>
+                {formData.hero_logo_url && (
+                  <div className="mt-4">
+                    <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+                    <img src={formData.hero_logo_url} alt="Hero logo preview" className="h-16 w-16 object-contain rounded-lg" />
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="url" className="space-y-4">
+                <Input
+                  type="url"
+                  placeholder="https://example.com/hero-logo.png"
+                  value={formData.hero_logo_url}
+                  onChange={(e) => setFormData({ ...formData, hero_logo_url: e.target.value })}
+                />
+                {formData.hero_logo_url && (
+                  <div className="mt-4">
+                    <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+                    <img src={formData.hero_logo_url} alt="Hero logo preview" className="h-16 w-16 object-contain rounded-lg" />
                   </div>
                 )}
               </TabsContent>

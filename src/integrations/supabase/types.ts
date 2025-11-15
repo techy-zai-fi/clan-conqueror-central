@@ -360,6 +360,7 @@ export type Database = {
       site_settings: {
         Row: {
           created_at: string | null
+          hero_logo_url: string | null
           id: string
           logo_url: string | null
           site_name: string
@@ -368,6 +369,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          hero_logo_url?: string | null
           id?: string
           logo_url?: string | null
           site_name?: string
@@ -376,6 +378,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          hero_logo_url?: string | null
           id?: string
           logo_url?: string | null
           site_name?: string
