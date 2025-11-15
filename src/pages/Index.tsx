@@ -28,6 +28,7 @@ interface Highlight {
 
 interface SiteSettings {
   logo_url: string | null;
+  hero_logo_url: string | null;
 }
 
 export default function Index() {
@@ -72,7 +73,7 @@ export default function Index() {
     // Fetch site settings
     const { data: settingsData } = await supabase
       .from('site_settings')
-      .select('logo_url')
+      .select('logo_url, hero_logo_url')
       .limit(1)
       .single();
     
@@ -89,12 +90,12 @@ export default function Index() {
         style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${heroBanner})` }}
       >
         <div className="text-center space-y-3 sm:space-y-4 md:space-y-6 px-4 animate-fade-in max-w-5xl mx-auto">
-          {siteSettings?.logo_url && (
+          {siteSettings?.hero_logo_url && (
             <div className="flex justify-center mb-4 md:mb-8">
               <img 
-                src={siteSettings.logo_url} 
+                src={siteSettings.hero_logo_url} 
                 alt="Event Logo" 
-                className="h-24 sm:h-32 md:h-40 lg:h-48 w-auto object-contain"
+                className="h-24 sm:h-32 md:h-40 lg:h-48 w-auto object-contain rounded-2xl"
               />
             </div>
           )}
