@@ -85,7 +85,7 @@ export default function Index() {
       
       {/* Hero Section */}
       <section 
-        className="relative min-h-[70vh] sm:min-h-[80vh] lg:min-h-screen bg-cover bg-center flex items-center justify-center"
+        className="relative min-h-[70vh] sm:min-h-[80vh] lg:min-h-screen bg-cover bg-center flex items-start justify-center pt-12 md:pt-20"
         style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${heroBanner})` }}
       >
         <div className="text-center space-y-3 sm:space-y-4 md:space-y-6 px-4 animate-fade-in max-w-5xl mx-auto">
