@@ -49,6 +49,10 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg}'],
+        // Allow precaching files up to 5 MiB. The default is 2 MiB; large images
+        // (like unoptimized PNGs) can exceed that. Prefer optimizing assets,
+        // but increase the limit here to avoid build-time errors.
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
