@@ -9,15 +9,16 @@ import Navbar from '@/components/Navbar';
 import AdminClans from '@/components/admin/AdminClans';
 import AdminSports from '@/components/admin/AdminSports';
 import AdminMatches from '@/components/admin/AdminMatches';
-import AdminAnnouncements from '@/components/admin/AdminAnnouncements';
-import AdminHighlights from '@/components/admin/AdminHighlights';
+import AdminContent from '@/components/admin/AdminContent';
+import AdminGallery from '@/components/admin/AdminGallery';
+import AdminUsers from '@/components/admin/AdminUsers';
 import AdminClanMembers from '@/components/admin/AdminClanMembers';
 import AdminTeamRosters from '@/components/admin/AdminTeamRosters';
 import { AdminCSVImport } from '@/components/admin/AdminCSVImport';
 import AdminSiteSettings from '@/components/admin/AdminSiteSettings';
 import AdminClanPanchs from '@/components/admin/AdminClanPanchs';
 import AdminSponsors from '@/components/admin/AdminSponsors';
-import AdminFooterSettings from '@/components/admin/AdminFooterSettings';
+
 
 const adminTabs = [
   { value: 'import', label: 'Import CSV' },
@@ -28,10 +29,10 @@ const adminTabs = [
   { value: 'rosters', label: 'Rosters' },
   { value: 'sports', label: 'Sports' },
   { value: 'matches', label: 'Matches' },
-  { value: 'announcements', label: 'Announcements' },
-  { value: 'highlights', label: 'Highlights' },
+  { value: 'content', label: 'Content' },
+  { value: 'gallery', label: 'Gallery' },
   { value: 'sponsors', label: 'Sponsors' },
-  { value: 'footer', label: 'Footer' },
+  { value: 'admins', label: 'Admins' },
 ];
 
 export default function Admin() {
@@ -91,7 +92,7 @@ export default function Admin() {
             </div>
 
             {/* Desktop Tabs */}
-            <TabsList className="hidden md:grid w-full grid-cols-12">
+            <TabsList className="hidden md:flex w-full flex-wrap">
               {adminTabs.map((tab) => (
                 <TabsTrigger key={tab.value} value={tab.value}>
                   {tab.label}
@@ -131,20 +132,20 @@ export default function Admin() {
             <AdminMatches />
           </TabsContent>
           
-          <TabsContent value="announcements">
-            <AdminAnnouncements />
+          <TabsContent value="content">
+            <AdminContent />
           </TabsContent>
-          
-          <TabsContent value="highlights">
-            <AdminHighlights />
+
+          <TabsContent value="gallery">
+            <AdminGallery />
           </TabsContent>
 
           <TabsContent value="sponsors">
             <AdminSponsors />
           </TabsContent>
 
-          <TabsContent value="footer">
-            <AdminFooterSettings />
+          <TabsContent value="admins">
+            <AdminUsers />
           </TabsContent>
         </Tabs>
       </main>

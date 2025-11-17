@@ -17,6 +17,7 @@ const navLinks = [
   { to: '/leaderboard', label: 'Leaderboard' },
   { to: '/schedule', label: 'Schedule' },
   { to: '/announcements', label: 'Announcements' },
+  { to: '/gallery', label: 'Gallery' },
 ];
 
 export default function Navbar() {
