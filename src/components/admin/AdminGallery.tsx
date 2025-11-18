@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Pencil, Trash2, Image as ImageIcon, Upload } from 'lucide-react';
 
 interface GalleryImage {
   id: string;
@@ -17,17 +17,26 @@ interface GalleryImage {
   created_at: string;
 }
 
+interface BulkImageData {
+  title: string;
+  description: string;
+  image_url: string;
+}
+
 export default function AdminGallery() {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
   const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     image_url: '',
     display_order: 0,
   });
+  const [bulkImages, setBulkImages] = useState<BulkImageData[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -51,6 +60,79 @@ export default function AdminGallery() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    try {
+      setUploading(true);
+      const uploadedImages: BulkImageData[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `gallery-${Date.now()}-${i}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('clan-logos')
+          .upload(fileName, file, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('clan-logos')
+          .getPublicUrl(fileName);
+
+        uploadedImages.push({
+          title: file.name.replace(/\.[^/.]+$/, ''),
+          description: '',
+          image_url: publicUrl,
+        });
+      }
+
+      setBulkImages(uploadedImages);
+      toast({ title: `${files.length} images uploaded successfully` });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleBulkSubmit = async () => {
+    try {
+      const maxOrder = images.length > 0 ? Math.max(...images.map(img => img.display_order)) : 0;
+      
+      const imagesToInsert = bulkImages.map((img, index) => ({
+        title: img.title,
+        description: img.description || null,
+        image_url: img.image_url,
+        display_order: maxOrder + index + 1,
+      }));
+
+      const { error } = await supabase
+        .from('gallery')
+        .insert(imagesToInsert);
+
+      if (error) throw error;
+      
+      toast({ title: `${bulkImages.length} images added successfully` });
+      setBulkImages([]);
+      setBulkDialogOpen(false);
+      fetchImages();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
     }
   };
 
@@ -131,91 +213,171 @@ export default function AdminGallery() {
 
   return (
     <div className="space-y-4">
-      <Dialog open={dialogOpen} onOpenChange={(open) => {
-        setDialogOpen(open);
-        if (!open) resetForm();
-      }}>
-        <DialogTrigger asChild>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Image
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingImage ? 'Edit Image' : 'Add Image'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              placeholder="Title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            />
-            <Textarea
-              placeholder="Description (optional)"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            />
-            <Input
-              placeholder="Image URL"
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-            />
-            <Input
-              type="number"
-              placeholder="Display Order"
-              value={formData.display_order}
-              onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) })}
-            />
-            {formData.image_url && (
-              <img
-                src={formData.image_url}
-                alt="Preview"
-                className="w-full h-48 object-cover rounded-lg"
-              />
-            )}
-            <Button onClick={handleSubmit} className="w-full">
-              {editingImage ? 'Update' : 'Add'}
+      <div className="flex gap-2">
+        <Dialog open={bulkDialogOpen} onOpenChange={(open) => {
+          setBulkDialogOpen(open);
+          if (!open) setBulkImages([]);
+        }}>
+          <DialogTrigger asChild>
+            <Button>
+              <Upload className="mr-2 h-4 w-4" />
+              Bulk Upload Images
             </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Bulk Upload Gallery Images</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                />
+                {uploading && <p className="text-sm text-muted-foreground mt-2">Uploading images...</p>}
+              </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {images.map((image) => (
-          <Card key={image.id}>
-            <CardHeader className="p-0">
+              {bulkImages.length > 0 && (
+                <>
+                  <div className="space-y-4">
+                    {bulkImages.map((img, index) => (
+                      <Card key={index}>
+                        <CardContent className="pt-4">
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                              <img src={img.image_url} alt={img.title} className="w-full h-48 object-cover rounded" />
+                            </div>
+                            <div className="space-y-2">
+                              <Input
+                                placeholder="Image title"
+                                value={img.title}
+                                onChange={(e) => {
+                                  const updated = [...bulkImages];
+                                  updated[index].title = e.target.value;
+                                  setBulkImages(updated);
+                                }}
+                              />
+                              <Textarea
+                                placeholder="Description (optional)"
+                                value={img.description}
+                                onChange={(e) => {
+                                  const updated = [...bulkImages];
+                                  updated[index].description = e.target.value;
+                                  setBulkImages(updated);
+                                }}
+                                rows={3}
+                              />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  <Button onClick={handleBulkSubmit} className="w-full">
+                    Add All {bulkImages.length} Images to Gallery
+                  </Button>
+                </>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={dialogOpen} onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) resetForm();
+        }}>
+          <DialogTrigger asChild>
+            <Button variant="outline">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Single Image
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editingImage ? 'Edit Image' : 'Add Image'}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Input
+                placeholder="Title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              />
+              <Textarea
+                placeholder="Description (optional)"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+              />
+              <Input
+                placeholder="Image URL"
+                value={formData.image_url}
+                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+              />
+              <Input
+                type="number"
+                placeholder="Display Order"
+                value={formData.display_order}
+                onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) })}
+              />
+              {formData.image_url && (
+                <img src={formData.image_url} alt="Preview" className="w-full h-48 object-cover rounded" />
+              )}
+              <Button onClick={handleSubmit} className="w-full">
+                {editingImage ? 'Update' : 'Add'} Image
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {images.length === 0 ? (
+        <Card className="p-12 text-center">
+          <ImageIcon className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+          <h3 className="text-xl font-semibold mb-2">No Images</h3>
+          <p className="text-muted-foreground">Add images to the gallery to get started</p>
+        </Card>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {images.map((image) => (
+            <Card key={image.id} className="overflow-hidden">
               <img
                 src={image.image_url}
                 alt={image.title}
-                className="w-full h-48 object-cover rounded-t-lg"
+                className="w-full h-48 object-cover"
               />
-            </CardHeader>
-            <CardContent className="p-4">
-              <CardTitle className="text-lg mb-2">{image.title}</CardTitle>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between text-base">
+                  <span className="truncate">{image.title}</span>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEditDialog(image)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(image.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardTitle>
+              </CardHeader>
               {image.description && (
-                <p className="text-sm text-muted-foreground mb-4">{image.description}</p>
+                <CardContent className="pt-0">
+                  <p className="text-sm text-muted-foreground line-clamp-2">{image.description}</p>
+                </CardContent>
               )}
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openEditDialog(image)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(image.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
