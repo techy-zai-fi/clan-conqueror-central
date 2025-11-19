@@ -64,17 +64,47 @@ export default function AdminUsers() {
 
   const handleAddAdmin = async () => {
     try {
+      if (!email.trim()) {
+        toast({
+          title: 'Error',
+          description: 'Please enter an email address',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       // First, find the user by email in profiles table
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('email', email)
-        .single();
+        .eq('email', email.trim())
+        .maybeSingle();
 
-      if (profileError || !profileData) {
+      if (profileError) {
+        throw profileError;
+      }
+
+      if (!profileData) {
         toast({
           title: 'Error',
-          description: 'User with this email not found',
+          description: 'User with this email not found. The user must sign in at least once before being made an admin.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Check if user already has admin role
+      const { data: existingRole } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('user_id', profileData.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (existingRole) {
+        toast({
+          title: 'Error',
+          description: 'This user is already an admin',
           variant: 'destructive',
         });
         return;
