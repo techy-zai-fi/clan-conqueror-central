@@ -235,7 +235,7 @@ export default function AdminClanPanchs() {
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-h-[calc(100vh-16rem)] overflow-y-auto pr-2">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold text-foreground">Manage Clan Panchs</h2>
