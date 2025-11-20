@@ -117,7 +117,7 @@ export default function AdminSports() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Manage Sports</h2>
+        <h2 className="text-2xl font-bold text-foreground">Manage Sports</h2>
         <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
             <Button>

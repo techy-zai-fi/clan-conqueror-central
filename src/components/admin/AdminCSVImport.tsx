@@ -201,7 +201,7 @@ export function AdminCSVImport() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold">Import CSV Data</h2>
+        <h2 className="text-3xl font-bold text-foreground">Import CSV Data</h2>
       </div>
 
       <Card className="p-6 space-y-6">
@@ -247,7 +247,7 @@ export function AdminCSVImport() {
 
       <Card className="p-4 bg-muted">
         <h3 className="font-semibold mb-2">Import Instructions:</h3>
-        <ul className="list-disc list-inside space-y-1 text-sm">
+        <ul className="list-disc list-inside space-y-1 text-sm text-foreground">
           <li>CSV files should use semicolon (;) as delimiter</li>
           <li>Import clans first, then members (members reference clan IDs)</li>
           <li>Existing records will be updated based on ID/reg_num</li>

@@ -182,7 +182,7 @@ export default function AdminTeamRosters() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Manage Team Rosters</h2>
+      <h2 className="text-2xl font-bold text-foreground">Manage Team Rosters</h2>
       
       <div>
         <Label>Select Match</Label>
@@ -259,7 +259,7 @@ export default function AdminTeamRosters() {
                                   }
                                 }}
                               />
-                              <label className="text-sm cursor-pointer">{member.name}</label>
+                              <label className="text-sm text-foreground cursor-pointer">{member.name}</label>
                             </div>
                           ))
                         )}

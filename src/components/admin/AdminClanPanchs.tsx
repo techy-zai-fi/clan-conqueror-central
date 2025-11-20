@@ -238,7 +238,7 @@ export default function AdminClanPanchs() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold">Manage Clan Panchs</h2>
+          <h2 className="text-3xl font-bold text-foreground">Manage Clan Panchs</h2>
           <p className="text-muted-foreground">Add up to 5 leaders for each clan</p>
         </div>
         <Dialog open={open} onOpenChange={(isOpen) => {
@@ -307,7 +307,7 @@ export default function AdminClanPanchs() {
                                 }
                               }}
                             />
-                            <label className="text-sm cursor-pointer flex-1">
+                            <label className="text-sm text-foreground cursor-pointer flex-1">
                               {member.name}
                               {member.email && (
                                 <span className="text-muted-foreground ml-2">({member.email})</span>
@@ -435,13 +435,13 @@ export default function AdminClanPanchs() {
                           />
                         ) : (
                           <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
-                            <span className="text-2xl font-bold">
+                            <span className="text-2xl font-bold text-foreground">
                               {panch.name.charAt(0)}
                             </span>
                           </div>
                         )}
                         <div className="text-center">
-                          <p className="font-semibold">{panch.name}</p>
+                          <p className="font-semibold text-foreground">{panch.name}</p>
                           <p className="text-sm text-muted-foreground">{panch.title}</p>
                           <p className="text-xs text-muted-foreground">Position: {panch.display_order}</p>
                         </div>
