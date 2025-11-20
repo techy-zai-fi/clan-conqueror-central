@@ -336,7 +336,7 @@ export default function AdminGallery() {
       {images.length === 0 ? (
         <Card className="p-12 text-center">
           <ImageIcon className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-xl font-semibold mb-2">No Images</h3>
+          <h3 className="text-xl font-semibold text-foreground mb-2">No Images</h3>
           <p className="text-muted-foreground">Add images to the gallery to get started</p>
         </Card>
       ) : (

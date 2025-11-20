@@ -281,7 +281,7 @@ export default function AdminMatches() {
 
         <TabsContent value="matches" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Manage Matches</h2>
+            <h2 className="text-2xl font-bold text-foreground">Manage Matches</h2>
             <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
               <DialogTrigger asChild>
                 <Button>
@@ -492,11 +492,11 @@ export default function AdminMatches() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm">Date: {match.date} at {match.time}</p>
-                  <p className="text-sm">Venue: {match.venue}</p>
-                  <p className="text-sm">Status: {match.status}</p>
-                  {match.score1 !== null && <p className="text-sm">Score: {match.score1} - {match.score2}</p>}
-                  {match.winner && <p className="text-sm">Winner: {match.winner}</p>}
+                  <p className="text-sm text-foreground">Date: {match.date} at {match.time}</p>
+                  <p className="text-sm text-foreground">Venue: {match.venue}</p>
+                  <p className="text-sm text-foreground">Status: {match.status}</p>
+                  {match.score1 !== null && <p className="text-sm text-foreground">Score: {match.score1} - {match.score2}</p>}
+                  {match.winner && <p className="text-sm text-foreground">Winner: {match.winner}</p>}
                 </CardContent>
               </Card>
             ))}
@@ -504,7 +504,7 @@ export default function AdminMatches() {
         </TabsContent>
 
         <TabsContent value="scores" className="space-y-4">
-          <h2 className="text-2xl font-bold">Update Match Scores</h2>
+          <h2 className="text-2xl font-bold text-foreground">Update Match Scores</h2>
           
           <Dialog open={scoreDialogOpen} onOpenChange={setScoreDialogOpen}>
             <DialogContent>
@@ -584,7 +584,7 @@ export default function AdminMatches() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div>
-                      <p className="text-lg">{match.sport_name}</p>
+                      <p className="text-lg text-foreground">{match.sport_name}</p>
                       <p className="text-sm font-normal text-muted-foreground">
                         {match.date} at {match.time}
                       </p>
@@ -598,13 +598,13 @@ export default function AdminMatches() {
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <div className="text-center flex-1">
-                      <p className="font-bold text-lg">{match.clan1}</p>
-                      <p className="text-3xl font-bold mt-2">{match.score1 ?? '-'}</p>
+                      <p className="font-bold text-lg text-foreground">{match.clan1}</p>
+                      <p className="text-3xl font-bold text-foreground mt-2">{match.score1 ?? '-'}</p>
                     </div>
                     <div className="text-2xl font-bold text-muted-foreground mx-4">VS</div>
                     <div className="text-center flex-1">
-                      <p className="font-bold text-lg">{match.clan2}</p>
-                      <p className="text-3xl font-bold mt-2">{match.score2 ?? '-'}</p>
+                      <p className="font-bold text-lg text-foreground">{match.clan2}</p>
+                      <p className="text-3xl font-bold text-foreground mt-2">{match.score2 ?? '-'}</p>
                     </div>
                   </div>
                   <div className="mt-4 text-center">

@@ -155,7 +155,7 @@ export default function AdminClanMembers() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Clan Members</h2>
+        <h2 className="text-2xl font-bold text-foreground">Clan Members</h2>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => resetForm()}>

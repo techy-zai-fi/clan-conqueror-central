@@ -194,7 +194,7 @@ export default function AdminClans() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Manage Clans</h2>
+        <h2 className="text-2xl font-bold text-foreground">Manage Clans</h2>
         <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
             <Button>
@@ -254,7 +254,7 @@ export default function AdminClans() {
                       {formData.logo.startsWith('http') ? (
                         <img src={formData.logo} alt="Logo preview" className="h-12 w-12 object-contain" />
                       ) : (
-                        <span className="text-2xl">{formData.logo}</span>
+                        <span className="text-2xl text-foreground">{formData.logo}</span>
                       )}
                     </div>
                   )}
@@ -384,9 +384,9 @@ export default function AdminClans() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">{clan.tagline}</p>
-              <p className="text-sm mt-2">Mascot: {clan.mascot}</p>
-              <p className="text-sm">Points: {clan.total_points}</p>
-              <p className="text-sm">Rank: {clan.rank}</p>
+              <p className="text-sm text-foreground mt-2">Mascot: {clan.mascot}</p>
+              <p className="text-sm text-foreground">Points: {clan.total_points}</p>
+              <p className="text-sm text-foreground">Rank: {clan.rank}</p>
             </CardContent>
           </Card>
         ))}

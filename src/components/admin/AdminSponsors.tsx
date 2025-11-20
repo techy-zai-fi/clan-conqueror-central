@@ -268,7 +268,7 @@ export default function AdminSponsors() {
                     className="h-24 w-24 object-contain"
                   />
                   <div className="text-center">
-                    <h3 className="font-semibold">{sponsor.name}</h3>
+                    <h3 className="font-semibold text-foreground">{sponsor.name}</h3>
                     <p className="text-sm text-muted-foreground">Order: {sponsor.display_order}</p>
                   </div>
                   <div className="flex gap-2 w-full">
