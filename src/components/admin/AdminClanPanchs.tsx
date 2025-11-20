@@ -251,14 +251,14 @@ export default function AdminClanPanchs() {
               Add Panch
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingPanch ? "Edit" : "Add"} Panch</DialogTitle>
               <DialogDescription>
                 {editingPanch ? "Update" : "Add a new"} panch leader for a clan
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 pr-2">
               <div>
                 <Label>Clan</Label>
                 <Select
@@ -335,75 +335,7 @@ export default function AdminClanPanchs() {
                   required
                 />
               </div>
-
-              <div>
-                <Label>Display Order (1-5)</Label>
-                <Select
-                  value={formData.display_order.toString()}
-                  onValueChange={(value) => setFormData({ ...formData, display_order: parseInt(value) })}
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[1, 2, 3, 4, 5].map((num) => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label>Image URL or Upload</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="Enter image URL"
-                  />
-                  <Label htmlFor="image-upload" className="cursor-pointer">
-                    <Button type="button" variant="outline" asChild>
-                      <span>
-                        <Upload className="h-4 w-4" />
-                      </span>
-                    </Button>
-                  </Label>
-                  <Input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label>Link to User Account (Optional)</Label>
-                <Select
-                  value={formData.user_id}
-                  onValueChange={(value) => setFormData({ ...formData, user_id: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select user account" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.email}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Link this panch to a user account to allow them to edit team rosters
-                </p>
-              </div>
-
+...
               <Button type="submit" className="w-full">
                 {editingPanch ? "Update" : "Add"} Panch
               </Button>
