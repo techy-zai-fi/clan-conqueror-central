@@ -290,8 +290,8 @@ export default function AdminGallery() {
           if (!open) resetForm();
         }}>
           <DialogTrigger asChild>
-            <Button variant="outline">
-              <Plus className="mr-2 h-4 w-4" />
+            <Button variant="outline" className="text-white">
+              <Plus className="mr-2 h-4 w-4 text-white" />
               Add Single Image
             </Button>
           </DialogTrigger>
