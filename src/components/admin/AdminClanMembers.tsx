@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ClanMember {
@@ -33,6 +33,7 @@ export default function AdminClanMembers() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<ClanMember | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     clan_id: '',
     name: '',
@@ -152,6 +153,16 @@ export default function AdminClanMembers() {
 
   if (loading) return <div>Loading members...</div>;
 
+  const filteredMembers = members.filter((member) => {
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      member.name.toLowerCase().includes(searchLower) ||
+      member.email?.toLowerCase().includes(searchLower) ||
+      member.reg_num?.toLowerCase().includes(searchLower) ||
+      member.batch?.toLowerCase().includes(searchLower)
+    );
+  });
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -254,8 +265,19 @@ export default function AdminClanMembers() {
         </Dialog>
       </div>
 
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="text"
+          placeholder="Search by name, email, reg number, or batch..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {members.map((member) => {
+        {filteredMembers.map((member) => {
           const clan = clans.find((c) => c.clan_code === member.clan_id || c.id === member.clan_id);
           return (
             <Card key={member.id}>
