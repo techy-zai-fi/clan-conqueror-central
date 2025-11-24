@@ -62,14 +62,25 @@ export default function AdminLeagueStandings() {
 
   const fetchStandings = async () => {
     try {
-      const sport = sports.find(s => s.id === selectedSport);
-      const categoryFilter = sport?.has_categories && selectedCategory !== 'all' ? selectedCategory : null;
+      const sport = sports.find((s) => s.id === selectedSport);
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('league_standings')
         .select('*')
-        .eq('sport_id', selectedSport)
-        .eq('category', categoryFilter)
+        .eq('sport_id', selectedSport);
+
+      if (sport?.has_categories) {
+        // For sports with categories: apply filter only when a specific category is chosen
+        if (selectedCategory && selectedCategory !== 'all') {
+          query = query.eq('category', selectedCategory);
+        }
+        // When selectedCategory is '' or 'all', we intentionally do NOT filter by category
+      } else {
+        // For sports without categories: include both NULL and empty string categories
+        query = query.or('category.is.null,category.eq.');
+      }
+
+      const { data, error } = await query
         .order('group_name')
         .order('total_points', { ascending: false });
 
