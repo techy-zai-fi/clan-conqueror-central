@@ -166,9 +166,9 @@ export default function AdminTeamEvents() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-foreground">Team Event Results</h2>
+      <h2 className="text-2xl font-bold text-foreground">Team Event Matches</h2>
       <p className="text-muted-foreground">
-        Manage sub-event results for team sports like Badminton and Table Tennis
+        Manage individual match results for team sports like Badminton and Table Tennis. Each sub-event (e.g., Men's Singles, Women's Doubles) is tracked as a separate match within the team event.
       </p>
 
       <div>
