@@ -238,12 +238,12 @@ export default function AdminTeamEvents() {
                     </div>
                     <div>
                       <Label htmlFor="winner">Winner (Optional)</Label>
-                      <Select value={formData.winner} onValueChange={(value) => setFormData({ ...formData, winner: value })}>
+                      <Select value={formData.winner || 'none'} onValueChange={(value) => setFormData({ ...formData, winner: value === 'none' ? '' : value })}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select winner" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           <SelectItem value={selectedMatchData.clan1}>{selectedMatchData.clan1}</SelectItem>
                           <SelectItem value={selectedMatchData.clan2}>{selectedMatchData.clan2}</SelectItem>
                         </SelectContent>
