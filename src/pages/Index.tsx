@@ -29,10 +29,17 @@ interface Highlight {
 interface SiteSettings {
   logo_url: string | null;
   hero_logo_url: string | null;
+  active_leaderboard_type: string;
+}
+
+interface LeagueStanding {
+  clan_name: string;
+  total_points: number;
 }
 
 export default function Index() {
   const [clans, setClans] = useState<Clan[]>([]);
+  const [leagueStandings, setLeagueStandings] = useState<LeagueStanding[]>([]);
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [totalClans, setTotalClans] = useState(0);
   const [totalSports, setTotalSports] = useState(0);
@@ -43,15 +50,38 @@ export default function Index() {
   }, []);
 
   const fetchData = async () => {
-    // Fetch clans
-    const { data: clansData } = await supabase
-      .from('clans')
-      .select('*')
-      .order('rank', { ascending: true, nullsFirst: false });
+    // Fetch site settings first to determine leaderboard type
+    const { data: settingsData } = await supabase
+      .from('site_settings')
+      .select('logo_url, hero_logo_url, active_leaderboard_type')
+      .limit(1)
+      .single();
     
-    if (clansData) {
-      setClans(clansData);
-      setTotalClans(clansData.length);
+    if (settingsData) setSiteSettings(settingsData);
+
+    const leaderboardType = settingsData?.active_leaderboard_type || 'playoff';
+
+    // Fetch appropriate leaderboard data
+    if (leaderboardType === 'league') {
+      // Fetch league standings
+      const { data: standingsData } = await supabase
+        .from('league_standings')
+        .select('clan_name, total_points')
+        .order('total_points', { ascending: false })
+        .limit(6);
+      
+      if (standingsData) setLeagueStandings(standingsData);
+    } else {
+      // Fetch playoff leaderboard (clans)
+      const { data: clansData } = await supabase
+        .from('clans')
+        .select('*')
+        .order('rank', { ascending: true, nullsFirst: false });
+      
+      if (clansData) {
+        setClans(clansData);
+        setTotalClans(clansData.length);
+      }
     }
 
     // Fetch highlights
@@ -70,14 +100,13 @@ export default function Index() {
     
     if (count) setTotalSports(count);
 
-    // Fetch site settings
-    const { data: settingsData } = await supabase
-      .from('site_settings')
-      .select('logo_url, hero_logo_url')
-      .limit(1)
-      .single();
-    
-    if (settingsData) setSiteSettings(settingsData);
+    // Fetch total clans count if showing league leaderboard
+    if (leaderboardType === 'league') {
+      const { count: clansCount } = await supabase
+        .from('clans')
+        .select('*', { count: 'exact', head: true });
+      if (clansCount) setTotalClans(clansCount);
+    }
   };
 
   return (
@@ -196,34 +225,55 @@ export default function Index() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-accent" />
-                Overall Standings
+                {siteSettings?.active_leaderboard_type === 'league' ? 'League Standings' : 'Overall Standings'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {clans.slice(0, 6).map((clan, index) => (
-                <div
-                  key={clan.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border hover:border-primary/50 transition-all"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl font-bold text-muted-foreground w-8">
-                      {index + 1}
-                    </span>
-                    <span className="text-3xl">
-                      {clan.logo && clan.logo.startsWith('http') ? (
-                        <img src={clan.logo} alt={clan.name} className="h-8 w-8 object-contain" />
-                      ) : (
-                        clan.logo
-                      )}
-                    </span>
-                    <div>
-                      <div className="font-semibold">{clan.name}</div>
-                      <div className="text-xs text-muted-foreground">{clan.tagline}</div>
+              {siteSettings?.active_leaderboard_type === 'league' ? (
+                <>
+                  {leagueStandings.map((standing, index) => (
+                    <div
+                      key={`${standing.clan_name}-${index}`}
+                      className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border hover:border-primary/50 transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl font-bold text-muted-foreground w-8">
+                          {index + 1}
+                        </span>
+                        <div className="font-semibold">{standing.clan_name}</div>
+                      </div>
+                      <div className="text-2xl font-bold text-accent">{standing.total_points}</div>
                     </div>
-                  </div>
-                  <div className="text-2xl font-bold text-accent">{clan.total_points}</div>
-                </div>
-              ))}
+                  ))}
+                </>
+              ) : (
+                <>
+                  {clans.slice(0, 6).map((clan, index) => (
+                    <div
+                      key={clan.id}
+                      className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border hover:border-primary/50 transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl font-bold text-muted-foreground w-8">
+                          {index + 1}
+                        </span>
+                        <span className="text-3xl">
+                          {clan.logo && clan.logo.startsWith('http') ? (
+                            <img src={clan.logo} alt={clan.name} className="h-8 w-8 object-contain" />
+                          ) : (
+                            clan.logo
+                          )}
+                        </span>
+                        <div>
+                          <div className="font-semibold">{clan.name}</div>
+                          <div className="text-xs text-muted-foreground">{clan.tagline}</div>
+                        </div>
+                      </div>
+                      <div className="text-2xl font-bold text-accent">{clan.total_points}</div>
+                    </div>
+                  ))}
+                </>
+              )}
               <Link to="/leaderboard">
                 <Button className="w-full mt-4" variant="outline">
                   View Full Leaderboard

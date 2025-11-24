@@ -508,6 +508,7 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          active_leaderboard_type: string | null
           created_at: string | null
           hero_logo_url: string | null
           id: string
@@ -517,6 +518,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          active_leaderboard_type?: string | null
           created_at?: string | null
           hero_logo_url?: string | null
           id?: string
@@ -526,6 +528,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          active_leaderboard_type?: string | null
           created_at?: string | null
           hero_logo_url?: string | null
           id?: string
