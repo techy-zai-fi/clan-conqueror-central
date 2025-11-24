@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -174,11 +175,12 @@ export default function AdminClanMembers() {
               Add Member
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh]">
             <DialogHeader>
               <DialogTitle>{editingMember ? 'Edit Member' : 'Add Member'}</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <ScrollArea className="max-h-[calc(90vh-8rem)] pr-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label>Clan</Label>
                 <Select value={formData.clan_id} onValueChange={(value) => setFormData({ ...formData, clan_id: value })}>
@@ -257,10 +259,11 @@ export default function AdminClanMembers() {
                   placeholder="3"
                 />
               </div>
-              <Button type="submit" className="w-full">
-                {editingMember ? 'Update' : 'Add'} Member
-              </Button>
-            </form>
+                <Button type="submit" className="w-full">
+                  {editingMember ? 'Update' : 'Add'} Member
+                </Button>
+              </form>
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </div>
