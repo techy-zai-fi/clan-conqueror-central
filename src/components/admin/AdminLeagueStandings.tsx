@@ -63,7 +63,7 @@ export default function AdminLeagueStandings() {
   const fetchStandings = async () => {
     try {
       const sport = sports.find(s => s.id === selectedSport);
-      const categoryFilter = sport?.has_categories ? selectedCategory : null;
+      const categoryFilter = sport?.has_categories && selectedCategory !== 'all' ? selectedCategory : null;
 
       const { data, error } = await supabase
         .from('league_standings')
@@ -161,7 +161,7 @@ export default function AdminLeagueStandings() {
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value="all">All</SelectItem>
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
                 <SelectItem value="mixed">Mixed</SelectItem>

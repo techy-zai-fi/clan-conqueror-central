@@ -73,7 +73,7 @@ export default function AdminKnockoutStages() {
   const fetchKnockoutStages = async () => {
     try {
       const sport = sports.find(s => s.id === selectedSport);
-      const categoryFilter = sport?.has_categories ? selectedCategory : null;
+      const categoryFilter = sport?.has_categories && selectedCategory !== 'all' ? selectedCategory : null;
 
       const { data, error } = await supabase
         .from('knockout_stages')
@@ -124,7 +124,7 @@ export default function AdminKnockoutStages() {
   const createKnockoutSlots = async () => {
     try {
       const sport = sports.find(s => s.id === selectedSport);
-      const categoryValue = sport?.has_categories ? selectedCategory : null;
+      const categoryValue = sport?.has_categories && selectedCategory !== 'all' ? selectedCategory : null;
 
       const stages = [
         { stage: 'semifinal', position: 1 },
@@ -193,7 +193,7 @@ export default function AdminKnockoutStages() {
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value="all">All</SelectItem>
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
                 <SelectItem value="mixed">Mixed</SelectItem>
@@ -234,24 +234,24 @@ export default function AdminKnockoutStages() {
                           {match ? `${match.clan1} vs ${match.clan2}` : 'Not assigned'}
                         </TableCell>
                         <TableCell>
-                          <Select
-                            value={sf.match_id || ''}
-                            onValueChange={(value) => handleAssignMatch(sf.id, value)}
-                          >
-                            <SelectTrigger className="w-[300px]">
-                              <SelectValue placeholder="Assign match" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="">None</SelectItem>
-                              {matches
-                                .filter(m => m.stage === 'semifinal')
-                                .map((m) => (
-                                  <SelectItem key={m.id} value={m.id}>
-                                    {m.clan1} vs {m.clan2} - {m.date}
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
+                    <Select
+                      value={sf.match_id || 'none'}
+                      onValueChange={(value) => handleAssignMatch(sf.id, value === 'none' ? '' : value)}
+                    >
+                      <SelectTrigger className="w-[300px]">
+                        <SelectValue placeholder="Assign match" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {matches
+                          .filter(m => m.stage === 'semifinal')
+                          .map((m) => (
+                            <SelectItem key={m.id} value={m.id}>
+                              {m.clan1} vs {m.clan2} - {m.date}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
                         </TableCell>
                       </TableRow>
                     );
@@ -270,14 +270,14 @@ export default function AdminKnockoutStages() {
                 <div className="flex items-center gap-4">
                   <span className="text-foreground">Assigned Match:</span>
                   <Select
-                    value={thirdPlace.match_id || ''}
-                    onValueChange={(value) => handleAssignMatch(thirdPlace.id, value)}
+                    value={thirdPlace.match_id || 'none'}
+                    onValueChange={(value) => handleAssignMatch(thirdPlace.id, value === 'none' ? '' : value)}
                   >
                     <SelectTrigger className="w-[300px]">
                       <SelectValue placeholder="Assign match" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {matches
                         .filter(m => m.stage === 'third_place')
                         .map((m) => (
@@ -301,14 +301,14 @@ export default function AdminKnockoutStages() {
                 <div className="flex items-center gap-4">
                   <span className="text-foreground">Assigned Match:</span>
                   <Select
-                    value={final.match_id || ''}
-                    onValueChange={(value) => handleAssignMatch(final.id, value)}
+                    value={final.match_id || 'none'}
+                    onValueChange={(value) => handleAssignMatch(final.id, value === 'none' ? '' : value)}
                   >
                     <SelectTrigger className="w-[300px]">
                       <SelectValue placeholder="Assign match" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {matches
                         .filter(m => m.stage === 'final')
                         .map((m) => (
