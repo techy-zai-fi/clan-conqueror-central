@@ -56,7 +56,8 @@ export default function AdminTeamEvents() {
     try {
       const { data, error } = await supabase
         .from('matches')
-        .select('id, sport_name, clan1, clan2, date, status')
+        .select('id, sport_name, clan1, clan2, date, status, sport_id, sports!inner(is_team_event)')
+        .eq('sports.is_team_event', true)
         .order('date', { ascending: false });
 
       if (error) throw error;
