@@ -27,6 +27,9 @@ interface Match {
   score1: number | null;
   score2: number | null;
   winner: string | null;
+  category?: string | null;
+  group_name?: string | null;
+  stage?: string;
 }
 
 export default function AdminMatches() {
@@ -57,6 +60,9 @@ export default function AdminMatches() {
     score1: 0,
     score2: 0,
     winner: '',
+    category: '',
+    group_name: '',
+    stage: 'league' as string,
   });
 
   useEffect(() => {
@@ -239,6 +245,9 @@ export default function AdminMatches() {
       score1: 0,
       score2: 0,
       winner: '',
+      category: '',
+      group_name: '',
+      stage: 'league',
     });
     setSelectedDate(undefined);
     setEditingMatch(null);
@@ -258,6 +267,9 @@ export default function AdminMatches() {
       score1: match.score1 || 0,
       score2: match.score2 || 0,
       winner: match.winner || '',
+      category: match.category || '',
+      group_name: match.group_name || '',
+      stage: match.stage || 'league',
     });
     // Try to parse the existing date if it's in a recognizable format
     try {
@@ -412,6 +424,62 @@ export default function AdminMatches() {
                   </div>
 
                   <div>
+                    <Label>Stage</Label>
+                    <Select
+                      value={formData.stage}
+                      onValueChange={(value) => setFormData({ ...formData, stage: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select stage" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="league">League</SelectItem>
+                        <SelectItem value="semifinal">Semifinal</SelectItem>
+                        <SelectItem value="third_place">3rd Place</SelectItem>
+                        <SelectItem value="final">Final</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {formData.stage === 'league' && (
+                    <>
+                      <div>
+                        <Label>Group (for League Stage)</Label>
+                        <Select
+                          value={formData.group_name}
+                          onValueChange={(value) => setFormData({ ...formData, group_name: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select group" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="A">Group A</SelectItem>
+                            <SelectItem value="B">Group B</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label>Category (Optional)</Label>
+                        <Select
+                          value={formData.category}
+                          onValueChange={(value) => setFormData({ ...formData, category: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">None</SelectItem>
+                            <SelectItem value="male">Male</SelectItem>
+                            <SelectItem value="female">Female</SelectItem>
+                            <SelectItem value="mixed">Mixed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </>
+                  )}
+
+                  <div>
                     <Label>Status</Label>
                     <Select
                       value={formData.status}
@@ -494,6 +562,9 @@ export default function AdminMatches() {
                 <CardContent>
                   <p className="text-sm text-foreground">Date: {match.date} at {match.time}</p>
                   <p className="text-sm text-foreground">Venue: {match.venue}</p>
+                  <p className="text-sm text-foreground">Stage: {match.stage || 'league'}</p>
+                  {match.group_name && <p className="text-sm text-foreground">Group: {match.group_name}</p>}
+                  {match.category && <p className="text-sm text-foreground">Category: {match.category}</p>}
                   <p className="text-sm text-foreground">Status: {match.status}</p>
                   {match.score1 !== null && <p className="text-sm text-foreground">Score: {match.score1} - {match.score2}</p>}
                   {match.winner && <p className="text-sm text-foreground">Winner: {match.winner}</p>}

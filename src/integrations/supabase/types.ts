@@ -145,15 +145,18 @@ export type Database = {
       clans: {
         Row: {
           bg_image: string | null
+          bronze_medals: number | null
           clan_code: string | null
           color: string
           created_at: string | null
           display_order: number | null
+          gold_medals: number | null
           id: string
           logo: string
           mascot: string
           name: string
           rank: number | null
+          silver_medals: number | null
           sub_color: string | null
           tagline: string
           total_points: number | null
@@ -162,15 +165,18 @@ export type Database = {
         }
         Insert: {
           bg_image?: string | null
+          bronze_medals?: number | null
           clan_code?: string | null
           color: string
           created_at?: string | null
           display_order?: number | null
+          gold_medals?: number | null
           id?: string
           logo: string
           mascot: string
           name: string
           rank?: number | null
+          silver_medals?: number | null
           sub_color?: string | null
           tagline: string
           total_points?: number | null
@@ -179,15 +185,18 @@ export type Database = {
         }
         Update: {
           bg_image?: string | null
+          bronze_medals?: number | null
           clan_code?: string | null
           color?: string
           created_at?: string | null
           display_order?: number | null
+          gold_medals?: number | null
           id?: string
           logo?: string
           mascot?: string
           name?: string
           rank?: number | null
+          silver_medals?: number | null
           sub_color?: string | null
           tagline?: string
           total_points?: number | null
@@ -307,17 +316,121 @@ export type Database = {
         }
         Relationships: []
       }
+      knockout_stages: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          id: string
+          match_id: string | null
+          position: number | null
+          sport_id: string
+          stage: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          match_id?: string | null
+          position?: number | null
+          sport_id: string
+          stage: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          match_id?: string | null
+          position?: number | null
+          sport_id?: string
+          stage?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knockout_stages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knockout_stages_sport_id_fkey"
+            columns: ["sport_id"]
+            isOneToOne: false
+            referencedRelation: "sports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      league_standings: {
+        Row: {
+          category: string | null
+          clan_name: string
+          created_at: string | null
+          group_name: string
+          id: string
+          matches_drawn: number | null
+          matches_lost: number | null
+          matches_played: number | null
+          matches_won: number | null
+          sport_id: string
+          total_points: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          clan_name: string
+          created_at?: string | null
+          group_name: string
+          id?: string
+          matches_drawn?: number | null
+          matches_lost?: number | null
+          matches_played?: number | null
+          matches_won?: number | null
+          sport_id: string
+          total_points?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          clan_name?: string
+          created_at?: string | null
+          group_name?: string
+          id?: string
+          matches_drawn?: number | null
+          matches_lost?: number | null
+          matches_played?: number | null
+          matches_won?: number | null
+          sport_id?: string
+          total_points?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "league_standings_sport_id_fkey"
+            columns: ["sport_id"]
+            isOneToOne: false
+            referencedRelation: "sports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
+          category: string | null
           clan1: string
           clan2: string
           created_at: string | null
           date: string
+          group_name: string | null
           id: string
           score1: number | null
           score2: number | null
           sport_id: string | null
           sport_name: string
+          stage: string | null
           status: string
           time: string
           updated_at: string | null
@@ -325,15 +438,18 @@ export type Database = {
           winner: string | null
         }
         Insert: {
+          category?: string | null
           clan1: string
           clan2: string
           created_at?: string | null
           date: string
+          group_name?: string | null
           id?: string
           score1?: number | null
           score2?: number | null
           sport_id?: string | null
           sport_name: string
+          stage?: string | null
           status: string
           time: string
           updated_at?: string | null
@@ -341,15 +457,18 @@ export type Database = {
           winner?: string | null
         }
         Update: {
+          category?: string | null
           clan1?: string
           clan2?: string
           created_at?: string | null
           date?: string
+          group_name?: string | null
           id?: string
           score1?: number | null
           score2?: number | null
           sport_id?: string | null
           sport_name?: string
+          stage?: string | null
           status?: string
           time?: string
           updated_at?: string | null
@@ -503,25 +622,72 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string
+          has_categories: boolean | null
           icon: string
           id: string
+          is_team_event: boolean | null
           name: string
         }
         Insert: {
           created_at?: string | null
           description: string
+          has_categories?: boolean | null
           icon: string
           id?: string
+          is_team_event?: boolean | null
           name: string
         }
         Update: {
           created_at?: string | null
           description?: string
+          has_categories?: boolean | null
           icon?: string
           id?: string
+          is_team_event?: boolean | null
           name?: string
         }
         Relationships: []
+      }
+      team_event_results: {
+        Row: {
+          clan1_score: number | null
+          clan2_score: number | null
+          created_at: string | null
+          event_name: string
+          id: string
+          match_id: string
+          updated_at: string | null
+          winner: string | null
+        }
+        Insert: {
+          clan1_score?: number | null
+          clan2_score?: number | null
+          created_at?: string | null
+          event_name: string
+          id?: string
+          match_id: string
+          updated_at?: string | null
+          winner?: string | null
+        }
+        Update: {
+          clan1_score?: number | null
+          clan2_score?: number | null
+          created_at?: string | null
+          event_name?: string
+          id?: string
+          match_id?: string
+          updated_at?: string | null
+          winner?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_event_results_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

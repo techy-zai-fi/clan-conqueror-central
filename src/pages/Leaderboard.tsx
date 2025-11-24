@@ -13,6 +13,9 @@ interface Clan {
   mascot: string;
   total_points: number;
   rank: number | null;
+  gold_medals: number;
+  silver_medals: number;
+  bronze_medals: number;
 }
 
 export default function Leaderboard() {
@@ -126,7 +129,23 @@ export default function Leaderboard() {
                         </div>
                       </div>
 
-                      {/* Points */}
+                       {/* Medals */}
+                      <div className="hidden sm:flex items-center gap-1 md:gap-2 min-w-[100px] md:min-w-[120px]">
+                        <div className="flex flex-col items-center">
+                          <Trophy className="h-4 w-4 md:h-5 md:w-5 text-yellow-400 mb-1" />
+                          <span className="text-xs md:text-sm font-bold">{clan.gold_medals || 0}</span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <Medal className="h-4 w-4 md:h-5 md:w-5 text-zinc-400 mb-1" />
+                          <span className="text-xs md:text-sm font-bold">{clan.silver_medals || 0}</span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <Medal className="h-4 w-4 md:h-5 md:w-5 text-amber-700 mb-1" />
+                          <span className="text-xs md:text-sm font-bold">{clan.bronze_medals || 0}</span>
+                        </div>
+                      </div>
+
+                       {/* Points */}
                       <div className="flex flex-col items-center min-w-[60px] md:min-w-[100px]">
                         <div className="text-2xl md:text-4xl font-bold text-accent mb-1">
                           {clan.total_points}

@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Clans from "./pages/Clans";
 import ClanDetail from "./pages/ClanDetail";
 import Sports from "./pages/Sports";
+import SportStandings from "./pages/SportStandings";
 import Leaderboard from "./pages/Leaderboard";
 import Schedule from "./pages/Schedule";
 import Announcements from "./pages/Announcements";
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/clans" element={<Clans />} />
           <Route path="/clans/:id" element={<ClanDetail />} />
           <Route path="/sports" element={<Sports />} />
+          <Route path="/sports/:sportId/standings" element={<SportStandings />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/announcements" element={<Announcements />} />
