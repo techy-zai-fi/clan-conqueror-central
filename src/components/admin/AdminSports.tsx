@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -14,6 +15,8 @@ interface Sport {
   name: string;
   icon: string;
   description: string;
+  has_categories: boolean;
+  is_team_event: boolean;
 }
 
 export default function AdminSports() {
@@ -25,6 +28,8 @@ export default function AdminSports() {
     name: '',
     icon: '',
     description: '',
+    has_categories: false,
+    is_team_event: false,
   });
 
   useEffect(() => {
@@ -98,6 +103,8 @@ export default function AdminSports() {
       name: '',
       icon: '',
       description: '',
+      has_categories: false,
+      is_team_event: false,
     });
     setEditingSport(null);
   };
@@ -108,6 +115,8 @@ export default function AdminSports() {
       name: sport.name,
       icon: sport.icon,
       description: sport.description,
+      has_categories: sport.has_categories,
+      is_team_event: sport.is_team_event,
     });
     setDialogOpen(true);
   };
@@ -157,6 +166,26 @@ export default function AdminSports() {
                   required
                 />
               </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="has_categories"
+                  checked={formData.has_categories}
+                  onCheckedChange={(checked) => setFormData({ ...formData, has_categories: checked as boolean })}
+                />
+                <Label htmlFor="has_categories" className="cursor-pointer">
+                  Has Categories (Male/Female/Mixed)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="is_team_event"
+                  checked={formData.is_team_event}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_team_event: checked as boolean })}
+                />
+                <Label htmlFor="is_team_event" className="cursor-pointer">
+                  Is Team Event (Multiple sub-events like Badminton/TT)
+                </Label>
+              </div>
               <Button type="submit" className="w-full">
                 {editingSport ? 'Update Sport' : 'Create Sport'}
               </Button>
@@ -183,6 +212,14 @@ export default function AdminSports() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">{sport.description}</p>
+              <div className="mt-2 flex gap-2 flex-wrap">
+                {sport.has_categories && (
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">Has Categories</span>
+                )}
+                {sport.is_team_event && (
+                  <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded">Team Event</span>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}
