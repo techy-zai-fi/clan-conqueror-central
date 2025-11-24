@@ -461,20 +461,22 @@ export default function AdminMatches() {
 
                       <div>
                         <Label>Category (Optional)</Label>
-                        <Select
-                          value={formData.category}
-                          onValueChange={(value) => setFormData({ ...formData, category: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="">None</SelectItem>
-                            <SelectItem value="male">Male</SelectItem>
-                            <SelectItem value="female">Female</SelectItem>
-                            <SelectItem value="mixed">Mixed</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <Select
+                        value={formData.category || 'none'}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, category: value === 'none' ? '' : value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                          <SelectItem value="mixed">Mixed</SelectItem>
+                        </SelectContent>
+                      </Select>
                       </div>
                     </>
                   )}
@@ -620,7 +622,7 @@ export default function AdminMatches() {
                   </Select>
                 </div>
 
-                {scoreData.status === 'completed' && (
+                {scoreData.status === 'completed' && scoringMatch && (
                   <div>
                     <Label>Winner</Label>
                     <Select
@@ -631,11 +633,11 @@ export default function AdminMatches() {
                         <SelectValue placeholder="Select winner" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={scoringMatch?.clan1 || ''}>
-                          {scoringMatch?.clan1}
+                        <SelectItem value={scoringMatch.clan1}>
+                          {scoringMatch.clan1}
                         </SelectItem>
-                        <SelectItem value={scoringMatch?.clan2 || ''}>
-                          {scoringMatch?.clan2}
+                        <SelectItem value={scoringMatch.clan2}>
+                          {scoringMatch.clan2}
                         </SelectItem>
                       </SelectContent>
                     </Select>
