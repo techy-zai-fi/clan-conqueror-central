@@ -19,7 +19,8 @@ import { AdminCSVImport } from '@/components/admin/AdminCSVImport';
 import AdminSiteSettings from '@/components/admin/AdminSiteSettings';
 import AdminClanPanchs from '@/components/admin/AdminClanPanchs';
 import AdminSponsors from '@/components/admin/AdminSponsors';
-
+import AdminTeamEvents from '@/components/admin/AdminTeamEvents';
+import AdminKnockoutStages from '@/components/admin/AdminKnockoutStages';
 
 const adminTabs = [
   { value: 'import', label: 'Import CSV' },
@@ -31,6 +32,8 @@ const adminTabs = [
   { value: 'sports', label: 'Sports' },
   { value: 'matches', label: 'Matches' },
   { value: 'standings', label: 'Standings' },
+  { value: 'knockout', label: 'Knockout' },
+  { value: 'team-events', label: 'Team Events' },
   { value: 'content', label: 'Content' },
   { value: 'gallery', label: 'Gallery' },
   { value: 'sponsors', label: 'Sponsors' },
@@ -136,6 +139,14 @@ export default function Admin() {
           
           <TabsContent value="standings">
             <AdminLeagueStandings />
+          </TabsContent>
+          
+          <TabsContent value="knockout">
+            <AdminKnockoutStages />
+          </TabsContent>
+          
+          <TabsContent value="team-events">
+            <AdminTeamEvents />
           </TabsContent>
           
           <TabsContent value="content">
