@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
 import { Upload, Link as LinkIcon, Save } from 'lucide-react';
 
@@ -16,6 +17,7 @@ interface SiteSettings {
   hero_logo_url: string | null;
   site_name: string;
   site_subtitle: string | null;
+  active_leaderboard_type: string;
 }
 
 interface FooterSettings {
@@ -45,6 +47,7 @@ export default function AdminSiteSettings() {
     hero_logo_url: '',
     site_name: '',
     site_subtitle: '',
+    active_leaderboard_type: 'playoff',
   });
   const [footerFormData, setFooterFormData] = useState({
     company_name: 'IT Committee IIM Bodh Gaya',
@@ -83,6 +86,7 @@ export default function AdminSiteSettings() {
         hero_logo_url: data.hero_logo_url || '',
         site_name: data.site_name || '',
         site_subtitle: data.site_subtitle || '',
+        active_leaderboard_type: data.active_leaderboard_type || 'playoff',
       });
     } catch (error: any) {
       toast.error('Error loading site settings');
@@ -163,6 +167,7 @@ export default function AdminSiteSettings() {
             hero_logo_url: formData.hero_logo_url || null,
             site_name: formData.site_name,
             site_subtitle: formData.site_subtitle || null,
+            active_leaderboard_type: formData.active_leaderboard_type,
           })
           .eq('id', settings.id);
 
@@ -175,6 +180,7 @@ export default function AdminSiteSettings() {
             hero_logo_url: formData.hero_logo_url || null,
             site_name: formData.site_name,
             site_subtitle: formData.site_subtitle || null,
+            active_leaderboard_type: formData.active_leaderboard_type,
           }]);
 
         if (error) throw error;
@@ -354,6 +360,30 @@ export default function AdminSiteSettings() {
                   value={formData.site_subtitle}
                   onChange={(e) => setFormData({ ...formData, site_subtitle: e.target.value })}
                 />
+              </div>
+
+              <div className="space-y-3">
+                <Label>Home Page Leaderboard Type</Label>
+                <RadioGroup
+                  value={formData.active_leaderboard_type}
+                  onValueChange={(value) => setFormData({ ...formData, active_leaderboard_type: value })}
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="playoff" id="playoff" />
+                    <Label htmlFor="playoff" className="font-normal cursor-pointer">
+                      Playoff Leaderboard (Overall medals & points from all sports)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="league" id="league" />
+                    <Label htmlFor="league" className="font-normal cursor-pointer">
+                      League Leaderboard (League stage standings)
+                    </Label>
+                  </div>
+                </RadioGroup>
+                <p className="text-sm text-muted-foreground">
+                  Choose which leaderboard to display on the home page
+                </p>
               </div>
 
               <Button type="submit">
