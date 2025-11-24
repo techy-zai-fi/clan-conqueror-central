@@ -9,6 +9,7 @@ import Navbar from '@/components/Navbar';
 import AdminClans from '@/components/admin/AdminClans';
 import AdminSports from '@/components/admin/AdminSports';
 import AdminMatches from '@/components/admin/AdminMatches';
+import AdminLeagueStandings from '@/components/admin/AdminLeagueStandings';
 import AdminContent from '@/components/admin/AdminContent';
 import AdminGallery from '@/components/admin/AdminGallery';
 import AdminUsers from '@/components/admin/AdminUsers';
@@ -29,6 +30,7 @@ const adminTabs = [
   { value: 'rosters', label: 'Rosters' },
   { value: 'sports', label: 'Sports' },
   { value: 'matches', label: 'Matches' },
+  { value: 'standings', label: 'Standings' },
   { value: 'content', label: 'Content' },
   { value: 'gallery', label: 'Gallery' },
   { value: 'sponsors', label: 'Sponsors' },
@@ -130,6 +132,10 @@ export default function Admin() {
           
           <TabsContent value="matches">
             <AdminMatches />
+          </TabsContent>
+          
+          <TabsContent value="standings">
+            <AdminLeagueStandings />
           </TabsContent>
           
           <TabsContent value="content">
