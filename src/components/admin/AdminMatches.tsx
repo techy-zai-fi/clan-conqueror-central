@@ -10,7 +10,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, CalendarIcon, Trophy } from 'lucide-react';
+import { Plus, Edit, Trash2, CalendarIcon, Trophy, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -42,6 +42,10 @@ export default function AdminMatches() {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [scoreDialogOpen, setScoreDialogOpen] = useState(false);
   const [scoringMatch, setScoringMatch] = useState<Match | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterSport, setFilterSport] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterStage, setFilterStage] = useState<string>('all');
   const [scoreData, setScoreData] = useState({
     score1: 0,
     score2: 0,
@@ -283,6 +287,20 @@ export default function AdminMatches() {
     setDialogOpen(true);
   };
 
+  const filteredMatches = matches.filter(match => {
+    const matchesSearch = searchQuery === '' || 
+      match.sport_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      match.clan1.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      match.clan2.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      match.venue.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesSport = filterSport === 'all' || match.sport_name === filterSport;
+    const matchesStatus = filterStatus === 'all' || match.status === filterStatus;
+    const matchesStage = filterStage === 'all' || match.stage === filterStage;
+    
+    return matchesSearch && matchesSport && matchesStatus && matchesStage;
+  });
+
   return (
     <div className="space-y-4">
       <Tabs defaultValue="matches" className="w-full">
@@ -292,8 +310,9 @@ export default function AdminMatches() {
         </TabsList>
 
         <TabsContent value="matches" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-foreground">Manage Matches</h2>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-foreground">Manage Matches</h2>
             <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
               <DialogTrigger asChild>
                 <Button>
@@ -543,10 +562,62 @@ export default function AdminMatches() {
                 </form>
               </DialogContent>
             </Dialog>
+            </div>
+            
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search matches..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              <Select value={filterSport} onValueChange={setFilterSport}>
+                <SelectTrigger className="w-full md:w-[200px]">
+                  <SelectValue placeholder="Filter by sport" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Sports</SelectItem>
+                  {sports.map((sport) => (
+                    <SelectItem key={sport.id} value={sport.name}>
+                      {sport.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-full md:w-[200px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="upcoming">Upcoming</SelectItem>
+                  <SelectItem value="live">Live</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={filterStage} onValueChange={setFilterStage}>
+                <SelectTrigger className="w-full md:w-[200px]">
+                  <SelectValue placeholder="Filter by stage" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Stages</SelectItem>
+                  <SelectItem value="league">League</SelectItem>
+                  <SelectItem value="semifinal">Semifinal</SelectItem>
+                  <SelectItem value="third_place">Third Place</SelectItem>
+                  <SelectItem value="final">Final</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="grid gap-4">
-            {matches.map((match) => (
+            {filteredMatches.map((match) => (
               <Card key={match.id}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">

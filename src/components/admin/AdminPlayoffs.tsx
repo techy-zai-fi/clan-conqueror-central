@@ -23,7 +23,7 @@ interface Match {
   status: string;
 }
 
-interface KnockoutStage {
+interface PlayoffStage {
   id: string;
   sport_id: string;
   stage: string;
@@ -32,11 +32,11 @@ interface KnockoutStage {
   match_id: string | null;
 }
 
-export default function AdminKnockoutStages() {
+export default function AdminPlayoffs() {
   const [sports, setSports] = useState<Sport[]>([]);
   const [selectedSport, setSelectedSport] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [knockoutStages, setKnockoutStages] = useState<KnockoutStage[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('none');
+  const [playoffStages, setPlayoffStages] = useState<PlayoffStage[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +46,7 @@ export default function AdminKnockoutStages() {
 
   useEffect(() => {
     if (selectedSport) {
-      fetchKnockoutStages();
+      fetchPlayoffStages();
       fetchMatches();
     }
   }, [selectedSport, selectedCategory]);
@@ -70,10 +70,10 @@ export default function AdminKnockoutStages() {
     }
   };
 
-  const fetchKnockoutStages = async () => {
+  const fetchPlayoffStages = async () => {
     try {
       const sport = sports.find(s => s.id === selectedSport);
-      const categoryFilter = sport?.has_categories && selectedCategory !== 'all' ? selectedCategory : null;
+      const categoryFilter = sport?.has_categories && selectedCategory !== 'none' ? selectedCategory : null;
 
       const { data, error } = await supabase
         .from('knockout_stages')
@@ -84,9 +84,9 @@ export default function AdminKnockoutStages() {
         .order('position');
 
       if (error) throw error;
-      setKnockoutStages(data || []);
+      setPlayoffStages(data || []);
     } catch (error: any) {
-      toast.error('Error loading knockout stages');
+      toast.error('Error loading playoff stages');
     }
   };
 
@@ -115,16 +115,16 @@ export default function AdminKnockoutStages() {
 
       if (error) throw error;
       toast.success('Match assigned successfully');
-      fetchKnockoutStages();
+      fetchPlayoffStages();
     } catch (error: any) {
       toast.error('Error assigning match');
     }
   };
 
-  const createKnockoutSlots = async () => {
+  const createPlayoffSlots = async () => {
     try {
       const sport = sports.find(s => s.id === selectedSport);
-      const categoryValue = sport?.has_categories && selectedCategory !== 'all' ? selectedCategory : null;
+      const categoryValue = sport?.has_categories && selectedCategory !== 'none' ? selectedCategory : null;
 
       const stages = [
         { stage: 'semifinal', position: 1 },
@@ -145,17 +145,17 @@ export default function AdminKnockoutStages() {
         );
 
       if (error) throw error;
-      toast.success('Knockout slots created');
-      fetchKnockoutStages();
+      toast.success('Playoff slots created');
+      fetchPlayoffStages();
     } catch (error: any) {
-      toast.error('Error creating knockout slots');
+      toast.error('Error creating playoff slots');
     }
   };
 
   const selectedSportData = sports.find(s => s.id === selectedSport);
-  const semifinals = knockoutStages.filter(k => k.stage === 'semifinal');
-  const thirdPlace = knockoutStages.find(k => k.stage === 'third_place');
-  const final = knockoutStages.find(k => k.stage === 'final');
+  const semifinals = playoffStages.filter(k => k.stage === 'semifinal');
+  const thirdPlace = playoffStages.find(k => k.stage === 'third_place');
+  const final = playoffStages.find(k => k.stage === 'final');
 
   if (loading) {
     return <div className="text-center text-foreground">Loading...</div>;
@@ -163,7 +163,7 @@ export default function AdminKnockoutStages() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-foreground">Knockout Stages</h2>
+      <h2 className="text-2xl font-bold text-foreground">Playoffs</h2>
       <p className="text-muted-foreground">
         Manage semifinals, third place, and final matches for each sport
       </p>
@@ -187,13 +187,13 @@ export default function AdminKnockoutStages() {
 
         {selectedSportData?.has_categories && (
           <div>
-            <Label className="text-foreground mb-2 block">Select Category</Label>
+            <Label className="text-foreground mb-2 block">Select Category (Optional)</Label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="none">No Category</SelectItem>
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
                 <SelectItem value="mixed">Mixed</SelectItem>
@@ -203,13 +203,13 @@ export default function AdminKnockoutStages() {
         )}
       </div>
 
-      {knockoutStages.length === 0 && (
-        <Button onClick={createKnockoutSlots}>
-          Create Knockout Slots
+      {playoffStages.length === 0 && (
+        <Button onClick={createPlayoffSlots}>
+          Create Playoff Slots
         </Button>
       )}
 
-      {knockoutStages.length > 0 && (
+      {playoffStages.length > 0 && (
         <div className="space-y-6">
           <Card>
             <CardHeader>
