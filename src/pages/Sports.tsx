@@ -67,9 +67,9 @@ export default function Sports() {
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Link to={`/schedule?sport=${sport.id}`}>
+                <Link to={`/sports/${sport.id}/schedule`}>
                   <Button className="w-full group text-sm md:text-base" variant="outline">
-                    <span>View Matches</span>
+                    <span>View Schedule and Results</span>
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
