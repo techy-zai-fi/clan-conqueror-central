@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Match {
@@ -19,14 +20,35 @@ interface Match {
 }
 
 export default function Schedule() {
+  const [searchParams] = useSearchParams();
+  const sportId = searchParams.get('sport');
+  
   const [matches, setMatches] = useState<Match[]>([]);
+  const [sportName, setSportName] = useState<string>('');
 
   useEffect(() => {
     const fetchMatches = async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('matches')
         .select('*')
         .order('date', { ascending: true });
+
+      if (sportId) {
+        query = query.eq('sport_id', sportId);
+        
+        // Fetch the sport name
+        const { data: sportData } = await supabase
+          .from('sports')
+          .select('name')
+          .eq('id', sportId)
+          .single();
+        
+        if (sportData) {
+          setSportName(sportData.name);
+        }
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching matches:', error);
@@ -37,7 +59,7 @@ export default function Schedule() {
     };
 
     fetchMatches();
-  }, []);
+  }, [sportId]);
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -45,10 +67,10 @@ export default function Schedule() {
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Match <span className="text-accent">Schedule</span>
+            {sportName ? `${sportName} ` : 'Match '}<span className="text-accent">Schedule</span>
           </h1>
           <p className="text-xl text-muted-foreground">
-            All upcoming and live matches
+            {sportName ? `All ${sportName} matches` : 'All upcoming and live matches'}
           </p>
         </div>
 
