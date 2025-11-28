@@ -199,22 +199,37 @@ export default function AdminClanPanchs() {
 
   const getClanMembers = () => {
     if (!formData.clan_id) return [];
+
     const clan = clans.find(c => c.id === formData.clan_id || c.clan_code === formData.clan_id);
     if (!clan) return [];
 
-    // Support both id- and code-based clan_id values for robustness
-    let filteredMembers = clanMembers.filter(m =>
-      m.clan_id === clan.clan_code ||
-      m.clan_id === clan.id ||
-      m.clan_id === formData.clan_id
-    );
+    const normalize = (value: string | null | undefined) => value?.trim().toLowerCase() || "";
+
+    const clanKeys = new Set([
+      normalize(clan.clan_code),
+      normalize(clan.id),
+      normalize(formData.clan_id),
+      normalize(clan.name),
+    ]);
+
+    let filteredMembers = clanMembers.filter(m => clanKeys.has(normalize(m.clan_id)));
 
     if (searchQuery.trim()) {
+      const search = searchQuery.toLowerCase();
       filteredMembers = filteredMembers.filter(m =>
-        m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (m.email && m.email.toLowerCase().includes(searchQuery.toLowerCase()))
+        m.name.toLowerCase().includes(search) ||
+        (m.email && m.email.toLowerCase().includes(search))
       );
     }
+
+    console.log("getClanMembers", {
+      selectedClanId: formData.clan_id,
+      clanId: clan.id,
+      clanCode: clan.clan_code,
+      clanName: clan.name,
+      totalMembers: clanMembers.length,
+      filteredMembers: filteredMembers.length,
+    });
 
     return filteredMembers;
   };
