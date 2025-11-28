@@ -19,6 +19,7 @@ interface SiteSettings {
   site_name: string;
   site_subtitle: string | null;
   active_leaderboard_type: string;
+  show_sponsors: boolean;
 }
 
 interface FooterSettings {
@@ -50,6 +51,7 @@ export default function AdminSiteSettings() {
     site_name: '',
     site_subtitle: '',
     active_leaderboard_type: 'playoff',
+    show_sponsors: true,
   });
   const [footerFormData, setFooterFormData] = useState({
     company_name: 'IT Committee IIM Bodh Gaya',
@@ -90,6 +92,7 @@ export default function AdminSiteSettings() {
         site_name: data.site_name || '',
         site_subtitle: data.site_subtitle || '',
         active_leaderboard_type: data.active_leaderboard_type || 'playoff',
+        show_sponsors: data.show_sponsors ?? true,
       });
     } catch (error: any) {
       toast.error('Error loading site settings');
@@ -172,6 +175,7 @@ export default function AdminSiteSettings() {
             site_name: formData.site_name,
             site_subtitle: formData.site_subtitle || null,
             active_leaderboard_type: formData.active_leaderboard_type,
+            show_sponsors: formData.show_sponsors,
           })
           .eq('id', settings.id);
 
@@ -186,6 +190,7 @@ export default function AdminSiteSettings() {
             site_name: formData.site_name,
             site_subtitle: formData.site_subtitle || null,
             active_leaderboard_type: formData.active_leaderboard_type,
+            show_sponsors: formData.show_sponsors,
           }]);
 
         if (error) throw error;
@@ -438,6 +443,20 @@ export default function AdminSiteSettings() {
                 <p className="text-sm text-muted-foreground">
                   Choose which leaderboard to display on the home page
                 </p>
+              </div>
+
+              <div className="flex items-center justify-between space-x-2 border rounded-lg p-4">
+                <div className="space-y-0.5">
+                  <Label htmlFor="show_sponsors" className="cursor-pointer">Show Sponsors Section</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Toggle sponsors section visibility on home page
+                  </p>
+                </div>
+                <Switch
+                  id="show_sponsors"
+                  checked={formData.show_sponsors}
+                  onCheckedChange={(checked) => setFormData({ ...formData, show_sponsors: checked })}
+                />
               </div>
 
               <Button type="submit">
