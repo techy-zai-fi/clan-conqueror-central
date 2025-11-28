@@ -51,18 +51,18 @@ const Footer = () => {
 
   const currentYear = new Date().getFullYear();
   const defaultSettings: FooterSettings = {
-    company_name: 'Clash of Clans',
-    about_text: 'IIM Bodh Gaya Premier Intra-College Sports Championship',
-    contact_email: null,
-    contact_phone: null,
-    address: null,
-    facebook_url: null,
-    twitter_url: null,
-    instagram_url: null,
-    linkedin_url: null,
-    youtube_url: null,
-    copyright_text: null,
-    show_social_links: false,
+    company_name: 'IT Committee IIM Bodh Gaya',
+    about_text: 'Leading the digital transformation at IIM Bodh Gaya through innovation and technology.',
+    contact_email: 'sportscomm@iimbg.ac.in',
+    contact_phone: '+91 6203 749062',
+    address: 'IIM Bodh Gaya, Uruvela, Bodh Gaya, Bihar 824234',
+    facebook_url: '',
+    twitter_url: '',
+    instagram_url: '',
+    linkedin_url: 'https://www.linkedin.com/company/it-committee-iim-bodh-gaya/',
+    youtube_url: '',
+    copyright_text: '© {year} IT Committee IIM Bodh Gaya. All rights reserved.',
+    show_social_links: true,
     show_newsletter: false,
   };
   
