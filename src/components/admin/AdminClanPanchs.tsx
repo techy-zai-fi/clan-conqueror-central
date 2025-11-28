@@ -199,21 +199,23 @@ export default function AdminClanPanchs() {
 
   const getClanMembers = () => {
     if (!formData.clan_id) return [];
-    const clan = clans.find(c => c.id === formData.clan_id);
+    const clan = clans.find(c => c.id === formData.clan_id || c.clan_code === formData.clan_id);
     if (!clan) return [];
-    
-    // Filter members by clan_code since clan_members.clan_id references clans.clan_code
-    let filteredMembers = clanMembers.filter(m => 
-      m.clan_id === clan.clan_code
+
+    // Support both id- and code-based clan_id values for robustness
+    let filteredMembers = clanMembers.filter(m =>
+      m.clan_id === clan.clan_code ||
+      m.clan_id === clan.id ||
+      m.clan_id === formData.clan_id
     );
-    
+
     if (searchQuery.trim()) {
-      filteredMembers = filteredMembers.filter(m => 
+      filteredMembers = filteredMembers.filter(m =>
         m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (m.email && m.email.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
-    
+
     return filteredMembers;
   };
 
@@ -244,7 +246,11 @@ export default function AdminClanPanchs() {
         </div>
         <Dialog open={open} onOpenChange={(isOpen) => {
           setOpen(isOpen);
-          if (!isOpen) resetForm();
+          if (isOpen) {
+            fetchData();
+          } else {
+            resetForm();
+          }
         }}>
           <DialogTrigger asChild>
             <Button>
