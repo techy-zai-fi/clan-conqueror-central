@@ -27,7 +27,10 @@ interface ClanMember {
   name: string;
   clan_id: string;
   email: string | null;
+  reg_num?: string | null;
+  batch?: string | null;
 }
+
 
 interface User {
   id: string;
@@ -65,22 +68,45 @@ export default function AdminClanPanchs() {
 
   const fetchData = async () => {
     try {
-      const [panchsRes, clansRes, usersRes, membersRes] = await Promise.all([
+      // Fetch panchs, clans, users in parallel
+      const [panchsRes, clansRes, usersRes] = await Promise.all([
         supabase.from("clan_panchs").select("*").order("clan_id").order("display_order"),
         supabase.from("clans").select("id, name, clan_code").order("name"),
         supabase.from("profiles").select("id, email"),
-        supabase.from("clan_members").select("id, name, clan_id, email"),
       ]);
+
+      // Fetch all clan_members using pagination
+      let allMembers = [];
+      let from = 0;
+      const batchSize = 1000;
+      let moreData = true;
+      while (moreData) {
+        const { data, error } = await supabase
+          .from("clan_members")
+          .select("id, name, clan_id, email, reg_num, batch")
+          .order("name")
+          .range(from, from + batchSize - 1);
+        if (error) {
+          toast.error("Failed to fetch clan members: " + error.message);
+          break;
+        }
+        if (data && data.length > 0) {
+          allMembers = allMembers.concat(data);
+          from += batchSize;
+          moreData = data.length === batchSize;
+        } else {
+          moreData = false;
+        }
+      }
 
       if (panchsRes.error) throw panchsRes.error;
       if (clansRes.error) throw clansRes.error;
       if (usersRes.error) throw usersRes.error;
-      if (membersRes.error) throw membersRes.error;
 
       setPanchs(panchsRes.data || []);
       setClans(clansRes.data || []);
       setUsers(usersRes.data || []);
-      setClanMembers(membersRes.data || []);
+      setClanMembers(allMembers);
     } catch (error: any) {
       toast.error("Failed to fetch data: " + error.message);
     } finally {
@@ -198,22 +224,28 @@ export default function AdminClanPanchs() {
   };
 
   const getClanMembers = () => {
-    if (!formData.clan_id) return [];
+    // Show all members, regardless of profile completeness
+    let baseMembers = [...clanMembers];
 
-    const clan = clans.find(c => c.id === formData.clan_id || c.clan_code === formData.clan_id);
-    if (!clan) return [];
+    // If a clan is selected, filter by clan_id
+    if (formData.clan_id) {
+      const clan = clans.find(c => c.id === formData.clan_id || c.clan_code === formData.clan_id);
+      if (clan) {
+        const selectedClanCode = (clan.clan_code || '').trim().toLowerCase();
+        baseMembers = baseMembers.filter(m => {
+          const memberClanId = (m.clan_id || '').trim().toLowerCase();
+          return memberClanId === selectedClanCode;
+        });
+      }
+    }
 
-    const normalize = (value: string | null | undefined) => value?.trim().toLowerCase() || "";
-
-    const clanKeys = new Set([
-      normalize(clan.clan_code),
-      normalize(clan.id),
-      normalize(formData.clan_id),
-    ]);
-
-    let baseMembers = clanMembers.filter(m => clanKeys.has(normalize(m.clan_id)));
-
-    baseMembers = baseMembers.sort((a, b) => a.name.localeCompare(b.name));
+    // Sort by name if available, else by id
+    baseMembers = baseMembers.sort((a, b) => {
+      if (a.name && b.name) {
+        return a.name.localeCompare(b.name);
+      }
+      return a.id.localeCompare(b.id);
+    });
 
     if (!searchQuery.trim()) {
       return baseMembers;
@@ -222,8 +254,10 @@ export default function AdminClanPanchs() {
     const search = searchQuery.trim().toLowerCase();
 
     return baseMembers.filter(m =>
-      m.name.toLowerCase().includes(search) ||
-      (m.email && m.email.toLowerCase().includes(search))
+      (m.name && m.name.toLowerCase().includes(search)) ||
+      (m.email && m.email.toLowerCase().includes(search)) ||
+      (m.reg_num && m.reg_num.toLowerCase().includes(search)) ||
+      (m.batch && m.batch.toLowerCase().includes(search))
     );
   };
 

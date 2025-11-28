@@ -53,16 +53,34 @@ export default function AdminClanMembers() {
   }, []);
 
   const fetchMembers = async () => {
-    const { data, error } = await supabase
-      .from('clan_members')
-      .select('*')
-      .order('name');
-    
-    if (error) {
-      toast({ title: 'Error fetching members', variant: 'destructive' });
-    } else {
-      setMembers(data || []);
+    let allMembers: ClanMember[] = [];
+    let from = 0;
+    const batchSize = 1000;
+    let moreData = true;
+
+    while (moreData) {
+      const { data, error } = await supabase
+        .from('clan_members')
+        .select('*')
+        .order('name')
+        .range(from, from + batchSize - 1);
+
+      if (error) {
+        toast({ title: 'Error fetching members', variant: 'destructive' });
+        break;
+      }
+
+      if (data && data.length > 0) {
+        allMembers = allMembers.concat(data);
+        from += batchSize;
+        moreData = data.length === batchSize;
+      } else {
+        moreData = false;
+      }
     }
+
+
+    setMembers(allMembers);
     setLoading(false);
   };
 
