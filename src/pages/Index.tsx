@@ -31,6 +31,7 @@ interface SiteSettings {
   hero_logo_url: string | null;
   itcom_logo_url: string | null;
   active_leaderboard_type: string;
+  show_sponsors: boolean;
 }
 
 interface LeagueStanding {
@@ -54,7 +55,7 @@ export default function Index() {
     // Fetch site settings first to determine leaderboard type
     const { data: settingsData } = await supabase
       .from('site_settings')
-      .select('logo_url, hero_logo_url, itcom_logo_url, active_leaderboard_type')
+      .select('logo_url, hero_logo_url, itcom_logo_url, active_leaderboard_type, show_sponsors')
       .limit(1)
       .single();
     
@@ -325,7 +326,7 @@ export default function Index() {
         </section>
 
         {/* Sponsors Section */}
-        <Sponsors />
+        {siteSettings?.show_sponsors && <Sponsors />}
       </div>
 
       {/* Footer */}

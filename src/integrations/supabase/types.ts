@@ -514,6 +514,7 @@ export type Database = {
           id: string
           itcom_logo_url: string | null
           logo_url: string | null
+          show_sponsors: boolean | null
           site_name: string
           site_subtitle: string | null
           updated_at: string | null
@@ -525,6 +526,7 @@ export type Database = {
           id?: string
           itcom_logo_url?: string | null
           logo_url?: string | null
+          show_sponsors?: boolean | null
           site_name?: string
           site_subtitle?: string | null
           updated_at?: string | null
@@ -536,6 +538,7 @@ export type Database = {
           id?: string
           itcom_logo_url?: string | null
           logo_url?: string | null
+          show_sponsors?: boolean | null
           site_name?: string
           site_subtitle?: string | null
           updated_at?: string | null
