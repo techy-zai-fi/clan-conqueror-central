@@ -26,6 +26,7 @@ export default function Navbar() {
   const { user, isAdmin, signOut } = useAuth();
   const [siteSettings, setSiteSettings] = useState({
     logo_url: null as string | null,
+    itcom_logo_url: null as string | null,
     site_name: 'Clash of Clans',
     site_subtitle: 'IIM Bodh Gaya 2025',
   });
@@ -46,6 +47,7 @@ export default function Navbar() {
       if (data) {
         setSiteSettings({
           logo_url: data.logo_url,
+          itcom_logo_url: data.itcom_logo_url,
           site_name: data.site_name || 'Clash of Clans',
           site_subtitle: data.site_subtitle || 'IIM Bodh Gaya 2025',
         });
@@ -70,6 +72,16 @@ export default function Navbar() {
               {siteSettings.site_subtitle && (
                 <span className="text-xs text-white/70">{siteSettings.site_subtitle}</span>
               )}
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-white/60">By ITCOM</span>
+                {siteSettings.itcom_logo_url && (
+                  <img 
+                    src={siteSettings.itcom_logo_url} 
+                    alt="ITCOM Logo" 
+                    className="h-3 w-auto object-contain"
+                  />
+                )}
+              </div>
             </div>
           </Link>
 
