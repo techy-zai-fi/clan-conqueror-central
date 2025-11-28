@@ -212,14 +212,23 @@ export default function AdminClanPanchs() {
       normalize(clan.name),
     ]);
 
-    let filteredMembers = clanMembers.filter(m => clanKeys.has(normalize(m.clan_id)));
+    const baseMembers = clanMembers.filter(m => clanKeys.has(normalize(m.clan_id)));
+    let filteredMembers = baseMembers;
 
     if (searchQuery.trim()) {
       const search = searchQuery.toLowerCase();
-      filteredMembers = filteredMembers.filter(m =>
+      filteredMembers = baseMembers.filter(m =>
         m.name.toLowerCase().includes(search) ||
         (m.email && m.email.toLowerCase().includes(search))
       );
+
+      // Fallback: if no clan-scoped matches, search across all members
+      if (filteredMembers.length === 0) {
+        filteredMembers = clanMembers.filter(m =>
+          m.name.toLowerCase().includes(search) ||
+          (m.email && m.email.toLowerCase().includes(search))
+        );
+      }
     }
 
     console.log("getClanMembers", {
@@ -228,6 +237,7 @@ export default function AdminClanPanchs() {
       clanCode: clan.clan_code,
       clanName: clan.name,
       totalMembers: clanMembers.length,
+      baseMembers: baseMembers.length,
       filteredMembers: filteredMembers.length,
     });
 
