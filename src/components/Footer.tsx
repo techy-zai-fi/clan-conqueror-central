@@ -22,9 +22,11 @@ interface FooterSettings {
 
 const Footer = () => {
   const [settings, setSettings] = useState<FooterSettings | null>(null);
+  const [itcomLogoUrl, setItcomLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFooterSettings();
+    fetchSiteSettings();
   }, []);
 
   const fetchFooterSettings = async () => {
@@ -35,6 +37,16 @@ const Footer = () => {
       .maybeSingle();
     
     if (data) setSettings(data);
+  };
+
+  const fetchSiteSettings = async () => {
+    const { data } = await supabase
+      .from('site_settings')
+      .select('itcom_logo_url')
+      .limit(1)
+      .maybeSingle();
+    
+    if (data) setItcomLogoUrl(data.itcom_logo_url);
   };
 
   if (!settings) return null;
@@ -49,6 +61,13 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* About Section */}
           <div className="space-y-4">
+            {itcomLogoUrl && (
+              <img 
+                src={itcomLogoUrl} 
+                alt="ITCOM Logo" 
+                className="h-16 w-auto object-contain mb-2"
+              />
+            )}
             <h3 className="text-lg font-bold text-foreground">{settings.company_name}</h3>
             {settings.about_text && (
               <p className="text-sm text-muted-foreground">{settings.about_text}</p>
