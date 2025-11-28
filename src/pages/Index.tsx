@@ -29,6 +29,7 @@ interface Highlight {
 interface SiteSettings {
   logo_url: string | null;
   hero_logo_url: string | null;
+  itcom_logo_url: string | null;
   active_leaderboard_type: string;
 }
 
@@ -53,7 +54,7 @@ export default function Index() {
     // Fetch site settings first to determine leaderboard type
     const { data: settingsData } = await supabase
       .from('site_settings')
-      .select('logo_url, hero_logo_url, active_leaderboard_type')
+      .select('logo_url, hero_logo_url, itcom_logo_url, active_leaderboard_type')
       .limit(1)
       .single();
     
@@ -134,6 +135,16 @@ export default function Index() {
           <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto px-2">
             IIM Bodh Gaya's Premier Intra-College Sports Championship
           </p>
+          <div className="flex items-center justify-center gap-2 md:gap-3 pt-2">
+            <span className="text-xs sm:text-sm md:text-base text-muted-foreground">By ITCOM</span>
+            {siteSettings?.itcom_logo_url && (
+              <img 
+                src={siteSettings.itcom_logo_url} 
+                alt="ITCOM Logo" 
+                className="h-6 sm:h-8 md:h-10 w-auto object-contain"
+              />
+            )}
+          </div>
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center pt-2">
             <Link to="/leaderboard" className="w-full sm:w-auto">
               <Button size="lg" className="gap-2 w-full">

@@ -512,6 +512,7 @@ export type Database = {
           created_at: string | null
           hero_logo_url: string | null
           id: string
+          itcom_logo_url: string | null
           logo_url: string | null
           site_name: string
           site_subtitle: string | null
@@ -522,6 +523,7 @@ export type Database = {
           created_at?: string | null
           hero_logo_url?: string | null
           id?: string
+          itcom_logo_url?: string | null
           logo_url?: string | null
           site_name?: string
           site_subtitle?: string | null
@@ -532,6 +534,7 @@ export type Database = {
           created_at?: string | null
           hero_logo_url?: string | null
           id?: string
+          itcom_logo_url?: string | null
           logo_url?: string | null
           site_name?: string
           site_subtitle?: string | null

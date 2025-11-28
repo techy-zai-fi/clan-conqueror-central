@@ -15,6 +15,7 @@ interface SiteSettings {
   id: string;
   logo_url: string | null;
   hero_logo_url: string | null;
+  itcom_logo_url: string | null;
   site_name: string;
   site_subtitle: string | null;
   active_leaderboard_type: string;
@@ -45,6 +46,7 @@ export default function AdminSiteSettings() {
   const [formData, setFormData] = useState({
     logo_url: '',
     hero_logo_url: '',
+    itcom_logo_url: '',
     site_name: '',
     site_subtitle: '',
     active_leaderboard_type: 'playoff',
@@ -84,6 +86,7 @@ export default function AdminSiteSettings() {
       setFormData({
         logo_url: data.logo_url || '',
         hero_logo_url: data.hero_logo_url || '',
+        itcom_logo_url: data.itcom_logo_url || '',
         site_name: data.site_name || '',
         site_subtitle: data.site_subtitle || '',
         active_leaderboard_type: data.active_leaderboard_type || 'playoff',
@@ -126,7 +129,7 @@ export default function AdminSiteSettings() {
     }
   };
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'hero_logo_url') => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'hero_logo_url' | 'itcom_logo_url') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -165,6 +168,7 @@ export default function AdminSiteSettings() {
           .update({
             logo_url: formData.logo_url || null,
             hero_logo_url: formData.hero_logo_url || null,
+            itcom_logo_url: formData.itcom_logo_url || null,
             site_name: formData.site_name,
             site_subtitle: formData.site_subtitle || null,
             active_leaderboard_type: formData.active_leaderboard_type,
@@ -178,6 +182,7 @@ export default function AdminSiteSettings() {
           .insert([{
             logo_url: formData.logo_url || null,
             hero_logo_url: formData.hero_logo_url || null,
+            itcom_logo_url: formData.itcom_logo_url || null,
             site_name: formData.site_name,
             site_subtitle: formData.site_subtitle || null,
             active_leaderboard_type: formData.active_leaderboard_type,
@@ -337,6 +342,55 @@ export default function AdminSiteSettings() {
                       <div className="mt-4">
                         <p className="text-sm text-muted-foreground mb-2">Preview:</p>
                         <img src={formData.hero_logo_url} alt="Hero logo preview" className="h-16 w-16 object-contain rounded-lg" />
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </div>
+
+              <div className="space-y-4">
+                <Label>ITCOM Logo (Shown with "By ITCOM" text)</Label>
+                <Tabs defaultValue="upload" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="upload">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload Image
+                    </TabsTrigger>
+                    <TabsTrigger value="url">
+                      <LinkIcon className="h-4 w-4 mr-2" />
+                      Image URL
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="upload" className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleLogoUpload(e, 'itcom_logo_url')}
+                        disabled={uploading}
+                      />
+                      {uploading && <span className="text-sm text-muted-foreground">Uploading...</span>}
+                    </div>
+                    {formData.itcom_logo_url && (
+                      <div className="mt-4">
+                        <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+                        <img src={formData.itcom_logo_url} alt="ITCOM logo preview" className="h-12 w-12 object-contain" />
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="url" className="space-y-4">
+                    <Input
+                      type="url"
+                      placeholder="https://example.com/itcom-logo.png"
+                      value={formData.itcom_logo_url}
+                      onChange={(e) => setFormData({ ...formData, itcom_logo_url: e.target.value })}
+                    />
+                    {formData.itcom_logo_url && (
+                      <div className="mt-4">
+                        <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+                        <img src={formData.itcom_logo_url} alt="ITCOM logo preview" className="h-12 w-12 object-contain" />
                       </div>
                     )}
                   </TabsContent>
