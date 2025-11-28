@@ -209,39 +209,22 @@ export default function AdminClanPanchs() {
       normalize(clan.clan_code),
       normalize(clan.id),
       normalize(formData.clan_id),
-      normalize(clan.name),
     ]);
 
-    const baseMembers = clanMembers.filter(m => clanKeys.has(normalize(m.clan_id)));
-    let filteredMembers = baseMembers;
+    let baseMembers = clanMembers.filter(m => clanKeys.has(normalize(m.clan_id)));
 
-    if (searchQuery.trim()) {
-      const search = searchQuery.toLowerCase();
-      filteredMembers = baseMembers.filter(m =>
-        m.name.toLowerCase().includes(search) ||
-        (m.email && m.email.toLowerCase().includes(search))
-      );
+    baseMembers = baseMembers.sort((a, b) => a.name.localeCompare(b.name));
 
-      // Fallback: if no clan-scoped matches, search across all members
-      if (filteredMembers.length === 0) {
-        filteredMembers = clanMembers.filter(m =>
-          m.name.toLowerCase().includes(search) ||
-          (m.email && m.email.toLowerCase().includes(search))
-        );
-      }
+    if (!searchQuery.trim()) {
+      return baseMembers;
     }
 
-    console.log("getClanMembers", {
-      selectedClanId: formData.clan_id,
-      clanId: clan.id,
-      clanCode: clan.clan_code,
-      clanName: clan.name,
-      totalMembers: clanMembers.length,
-      baseMembers: baseMembers.length,
-      filteredMembers: filteredMembers.length,
-    });
+    const search = searchQuery.trim().toLowerCase();
 
-    return filteredMembers;
+    return baseMembers.filter(m =>
+      m.name.toLowerCase().includes(search) ||
+      (m.email && m.email.toLowerCase().includes(search))
+    );
   };
 
   const handleMemberSelect = (memberId: string) => {
