@@ -200,10 +200,11 @@ export default function AdminClanPanchs() {
   const getClanMembers = () => {
     if (!formData.clan_id) return [];
     const clan = clans.find(c => c.id === formData.clan_id);
+    if (!clan) return [];
+    
+    // Filter members by clan_code since clan_members.clan_id references clans.clan_code
     let filteredMembers = clanMembers.filter(m => 
-      m.clan_id === formData.clan_id || 
-      m.clan_id === clan?.clan_code ||
-      m.clan_id === clan?.id
+      m.clan_id === clan.clan_code
     );
     
     if (searchQuery.trim()) {
