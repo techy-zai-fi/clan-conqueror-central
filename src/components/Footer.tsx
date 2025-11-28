@@ -49,11 +49,26 @@ const Footer = () => {
     if (data) setItcomLogoUrl(data.itcom_logo_url);
   };
 
-  if (!settings) return null;
-
   const currentYear = new Date().getFullYear();
-  const copyrightText = settings.copyright_text?.replace('{year}', currentYear.toString()) || 
-    `© ${currentYear} ${settings.company_name}. All rights reserved.`;
+  const defaultSettings: FooterSettings = {
+    company_name: 'Clash of Clans',
+    about_text: 'IIM Bodh Gaya Premier Intra-College Sports Championship',
+    contact_email: null,
+    contact_phone: null,
+    address: null,
+    facebook_url: null,
+    twitter_url: null,
+    instagram_url: null,
+    linkedin_url: null,
+    youtube_url: null,
+    copyright_text: null,
+    show_social_links: false,
+    show_newsletter: false,
+  };
+  
+  const footerSettings = settings || defaultSettings;
+  const copyrightText = footerSettings.copyright_text?.replace('{year}', currentYear.toString()) || 
+    `© ${currentYear} ${footerSettings.company_name}. All rights reserved.`;
 
   return (
     <footer className="w-full bg-card border-t border-border mt-16">
@@ -68,9 +83,9 @@ const Footer = () => {
                 className="h-16 w-auto object-contain mb-2"
               />
             )}
-            <h3 className="text-lg font-bold text-foreground">{settings.company_name}</h3>
-            {settings.about_text && (
-              <p className="text-sm text-muted-foreground">{settings.about_text}</p>
+            <h3 className="text-lg font-bold text-foreground">{footerSettings.company_name}</h3>
+            {footerSettings.about_text && (
+              <p className="text-sm text-muted-foreground">{footerSettings.about_text}</p>
             )}
           </div>
 
@@ -90,33 +105,33 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-foreground">Contact Us</h3>
             <ul className="space-y-3 text-sm">
-              {settings.contact_email && (
+              {footerSettings.contact_email && (
                 <li className="flex items-start gap-2">
                   <Mail className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <a href={`mailto:${settings.contact_email}`} className="text-muted-foreground hover:text-primary transition-colors break-all">
-                    {settings.contact_email}
+                  <a href={`mailto:${footerSettings.contact_email}`} className="text-muted-foreground hover:text-primary transition-colors break-all">
+                    {footerSettings.contact_email}
                   </a>
                 </li>
               )}
-              {settings.contact_phone && (
+              {footerSettings.contact_phone && (
                 <li className="flex items-start gap-2">
                   <Phone className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <a href={`tel:${settings.contact_phone}`} className="text-muted-foreground hover:text-primary transition-colors">
-                    {settings.contact_phone}
+                  <a href={`tel:${footerSettings.contact_phone}`} className="text-muted-foreground hover:text-primary transition-colors">
+                    {footerSettings.contact_phone}
                   </a>
                 </li>
               )}
-              {settings.address && (
+              {footerSettings.address && (
                 <li className="flex items-start gap-2">
                   <MapPin className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <span className="text-muted-foreground">{settings.address}</span>
+                  <span className="text-muted-foreground">{footerSettings.address}</span>
                 </li>
               )}
             </ul>
           </div>
 
           {/* Newsletter */}
-          {settings.show_newsletter && (
+          {footerSettings.show_newsletter && (
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-foreground">Stay Updated</h3>
               <p className="text-sm text-muted-foreground">Subscribe to get the latest updates and news.</p>
@@ -136,30 +151,30 @@ const Footer = () => {
         <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground text-center md:text-left">{copyrightText}</p>
           
-          {settings.show_social_links && (
+          {footerSettings.show_social_links && (
             <div className="flex gap-4">
-              {settings.facebook_url && (
-                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              {footerSettings.facebook_url && (
+                <a href={footerSettings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
                   <Facebook className="h-5 w-5" />
                 </a>
               )}
-              {settings.twitter_url && (
-                <a href={settings.twitter_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              {footerSettings.twitter_url && (
+                <a href={footerSettings.twitter_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
                   <Twitter className="h-5 w-5" />
                 </a>
               )}
-              {settings.instagram_url && (
-                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              {footerSettings.instagram_url && (
+                <a href={footerSettings.instagram_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
                   <Instagram className="h-5 w-5" />
                 </a>
               )}
-              {settings.linkedin_url && (
-                <a href={settings.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              {footerSettings.linkedin_url && (
+                <a href={footerSettings.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
                   <Linkedin className="h-5 w-5" />
                 </a>
               )}
-              {settings.youtube_url && (
-                <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              {footerSettings.youtube_url && (
+                <a href={footerSettings.youtube_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
                   <Youtube className="h-5 w-5" />
                 </a>
               )}
