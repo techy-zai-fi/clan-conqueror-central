@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
+import Footer from '@/components/Footer';
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -60,26 +61,29 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Clash of Clans</CardTitle>
-          <CardDescription className="text-center">Sign in with your IIM Bodh Gaya account</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center gap-4">
-          <Button 
-            onClick={handleGoogleSignIn} 
-            className="w-full" 
-            disabled={loading}
-            size="lg"
-          >
-            {loading ? 'Signing in...' : 'Sign in with Google (@iimbg.ac.in)'}
-          </Button>
-          <p className="text-sm text-muted-foreground text-center">
-            Only @iimbg.ac.in email addresses are allowed
-          </p>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">Clash of Clans</CardTitle>
+            <CardDescription className="text-center">Sign in with your IIM Bodh Gaya account</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center gap-4">
+            <Button 
+              onClick={handleGoogleSignIn} 
+              className="w-full" 
+              disabled={loading}
+              size="lg"
+            >
+              {loading ? 'Signing in...' : 'Sign in with Google (@iimbg.ac.in)'}
+            </Button>
+            <p className="text-sm text-muted-foreground text-center">
+              Only @iimbg.ac.in email addresses are allowed
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+      <Footer />
     </div>
   );
 }
