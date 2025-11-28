@@ -30,6 +30,7 @@ export default function AdminClans() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClan, setEditingClan] = useState<Clan | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingBgImage, setUploadingBgImage] = useState(false);
   const [formData, setFormData] = useState({
     clan_code: '',
     name: '',
@@ -103,6 +104,47 @@ export default function AdminClans() {
       toast.error(error.message || 'Error uploading logo');
     } finally {
       setUploadingLogo(false);
+    }
+  };
+
+  const handleBgImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB for background images)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB');
+      return;
+    }
+
+    try {
+      setUploadingBgImage(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `bg-${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('clan-logos')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('clan-logos')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, bg_image: publicUrl });
+      toast.success('Background image uploaded successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Error uploading background image');
+    } finally {
+      setUploadingBgImage(false);
     }
   };
 
@@ -302,13 +344,35 @@ export default function AdminClans() {
                 />
               </div>
               <div>
-                <Label htmlFor="bg_image">Background Image URL</Label>
-                <Input
-                  id="bg_image"
-                  value={formData.bg_image}
-                  onChange={(e) => setFormData({ ...formData, bg_image: e.target.value })}
-                  placeholder="https://..."
-                />
+                <Label htmlFor="bg_image">Background Image</Label>
+                <div className="space-y-2">
+                  {formData.bg_image && (
+                    <img src={formData.bg_image} alt="Background preview" className="h-24 w-full object-cover rounded" />
+                  )}
+                  <div className="flex gap-2">
+                    <Input
+                      id="bg_image"
+                      value={formData.bg_image}
+                      onChange={(e) => setFormData({ ...formData, bg_image: e.target.value })}
+                      placeholder="Or paste image URL"
+                    />
+                    <Label htmlFor="bg-image-file" className="cursor-pointer">
+                      <Button type="button" variant="outline" disabled={uploadingBgImage} asChild>
+                        <span>
+                          <Upload className="h-4 w-4 mr-2" />
+                          {uploadingBgImage ? 'Uploading...' : 'Upload'}
+                        </span>
+                      </Button>
+                    </Label>
+                    <Input
+                      id="bg-image-file"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleBgImageUpload}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
               </div>
               <div>
                 <Label htmlFor="video_url">Intro Video URL (YouTube embed)</Label>
