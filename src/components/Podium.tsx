@@ -26,9 +26,9 @@ export default function Podium({ leaderboardType, leagueStandings, clans }: Podi
   // For playoff mode, use clans sorted by total_points
   const topClans = clans.slice(0, 3);
 
-  // For league mode, group by Group A and Group B
-  const groupA = leagueStandings.filter(s => s.group_name === 'Group A').sort((a, b) => b.total_points - a.total_points);
-  const groupB = leagueStandings.filter(s => s.group_name === 'Group B').sort((a, b) => b.total_points - a.total_points);
+  // For league mode, group by Group A and Group B (handles both "A"/"B" and "Group A"/"Group B" formats)
+  const groupA = leagueStandings.filter(s => s.group_name === 'A' || s.group_name === 'Group A').sort((a, b) => b.total_points - a.total_points);
+  const groupB = leagueStandings.filter(s => s.group_name === 'B' || s.group_name === 'Group B').sort((a, b) => b.total_points - a.total_points);
 
   const renderPlayoffPodium = () => {
     if (topClans.length < 3) return null;

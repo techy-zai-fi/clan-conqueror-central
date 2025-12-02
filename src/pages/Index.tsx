@@ -123,9 +123,9 @@ export default function Index() {
     if (count) setTotalSports(count);
   };
 
-  // Group league standings by group
-  const groupA = leagueStandings.filter(s => s.group_name === 'Group A').sort((a, b) => b.total_points - a.total_points);
-  const groupB = leagueStandings.filter(s => s.group_name === 'Group B').sort((a, b) => b.total_points - a.total_points);
+  // Group league standings by group (handles both "A"/"B" and "Group A"/"Group B" formats)
+  const groupA = leagueStandings.filter(s => s.group_name === 'A' || s.group_name === 'Group A').sort((a, b) => b.total_points - a.total_points);
+  const groupB = leagueStandings.filter(s => s.group_name === 'B' || s.group_name === 'Group B').sort((a, b) => b.total_points - a.total_points);
 
   return (
     <div className="min-h-screen bg-background">
