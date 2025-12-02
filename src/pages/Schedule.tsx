@@ -51,6 +51,7 @@ export default function Schedule() {
       let query = supabase
         .from('matches')
         .select('*')
+        .eq('status', 'upcoming')
         .order('date', { ascending: true });
 
       if (sportId) {
