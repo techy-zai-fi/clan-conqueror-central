@@ -19,15 +19,35 @@ interface Match {
   score2: number | null;
 }
 
+interface Sport {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 export default function Schedule() {
   const [searchParams] = useSearchParams();
   const sportId = searchParams.get('sport');
   
   const [matches, setMatches] = useState<Match[]>([]);
   const [sportName, setSportName] = useState<string>('');
+  const [sportsMap, setSportsMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const fetchMatches = async () => {
+    const fetchData = async () => {
+      // Fetch all sports to get icons
+      const { data: sportsData } = await supabase
+        .from('sports')
+        .select('id, name, icon');
+      
+      if (sportsData) {
+        const map: Record<string, string> = {};
+        sportsData.forEach((sport: Sport) => {
+          map[sport.name] = sport.icon;
+        });
+        setSportsMap(map);
+      }
+
       let query = supabase
         .from('matches')
         .select('*')
@@ -58,7 +78,7 @@ export default function Schedule() {
       setMatches(data || []);
     };
 
-    fetchMatches();
+    fetchData();
   }, [sportId]);
   return (
     <div className="min-h-screen bg-background">
@@ -84,7 +104,7 @@ export default function Schedule() {
               <CardHeader>
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <CardTitle className="text-lg sm:text-xl md:text-2xl flex items-center gap-2">
-                    <span className="text-2xl md:text-4xl">{match.sport_name === 'Cricket' ? '🏏' : match.sport_name === 'Football' ? '⚽' : match.sport_name === 'Basketball' ? '🏀' : '🏐'}</span>
+                    <span className="text-2xl md:text-4xl">{sportsMap[match.sport_name] || '🏅'}</span>
                     <span className="hidden sm:inline">{match.sport_name}</span>
                   </CardTitle>
                   {match.status === 'live' && (
