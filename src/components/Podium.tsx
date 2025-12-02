@@ -1,7 +1,5 @@
-import { Trophy, Medal } from 'lucide-react';
+import { Trophy, Medal, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface Clan {
   id: string;
@@ -11,42 +9,33 @@ interface Clan {
   total_points: number;
 }
 
-export default function Podium() {
-  const [topClans, setTopClans] = useState<Clan[]>([]);
+interface AggregatedLeagueStanding {
+  clan_name: string;
+  group_name: string;
+  total_points: number;
+  clan?: Clan;
+}
 
-  useEffect(() => {
-    const fetchTopClans = async () => {
-      const { data, error } = await supabase
-        .from('clans')
-        .select('*')
-        .order('total_points', { ascending: false })
-        .limit(3);
+interface PodiumProps {
+  leaderboardType: string;
+  leagueStandings: AggregatedLeagueStanding[];
+  clans: Clan[];
+}
 
-      if (error) {
-        console.error('Error fetching clans:', error);
-        return;
-      }
+export default function Podium({ leaderboardType, leagueStandings, clans }: PodiumProps) {
+  // For playoff mode, use clans sorted by total_points
+  const topClans = clans.slice(0, 3);
 
-      setTopClans(data || []);
-    };
+  // For league mode, group by Group A and Group B
+  const groupA = leagueStandings.filter(s => s.group_name === 'Group A').sort((a, b) => b.total_points - a.total_points);
+  const groupB = leagueStandings.filter(s => s.group_name === 'Group B').sort((a, b) => b.total_points - a.total_points);
 
-    fetchTopClans();
-  }, []);
+  const renderPlayoffPodium = () => {
+    if (topClans.length < 3) return null;
 
-  if (topClans.length < 3) return null;
+    const [first, second, third] = topClans;
 
-  const [first, second, third] = topClans;
-
-  return (
-    <div className="w-full max-w-5xl mx-auto px-2 sm:px-4">
-      <div className="text-center mb-6 md:mb-8">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
-          <Trophy className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-accent" />
-          Current Standings
-        </h2>
-        <p className="text-sm md:text-base text-muted-foreground">Live podium updates</p>
-      </div>
-
+    return (
       <div className="flex items-end justify-center gap-2 sm:gap-4 md:gap-8">
         {/* Second Place */}
         <Card 
@@ -122,6 +111,85 @@ export default function Podium() {
           <div className="mt-1 sm:mt-1.5 md:mt-2 text-lg sm:text-xl md:text-2xl font-bold text-amber-700">3rd</div>
         </Card>
       </div>
+    );
+  };
+
+  const renderGroupStandings = (standings: AggregatedLeagueStanding[], groupName: string, colorClass: string) => {
+    if (standings.length === 0) return null;
+
+    return (
+      <Card className="p-4 md:p-6 bg-gradient-to-b from-card to-secondary/30 border-2 border-border">
+        <div className="flex items-center gap-2 mb-4">
+          <Users className={`h-5 w-5 ${colorClass}`} />
+          <h3 className="text-lg md:text-xl font-bold">{groupName}</h3>
+        </div>
+        <div className="space-y-3">
+          {standings.map((standing, index) => {
+            const clan = standing.clan;
+            const isFirst = index === 0;
+            
+            return (
+              <div
+                key={`${standing.clan_name}-${groupName}`}
+                className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                  isFirst ? 'bg-accent/10 border-accent/50' : 'bg-background/50 border-border'
+                }`}
+                style={clan ? { borderLeftColor: clan.color, borderLeftWidth: '4px' } : {}}
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`text-xl font-bold w-6 ${isFirst ? 'text-accent' : 'text-muted-foreground'}`}>
+                    {index + 1}
+                  </span>
+                  {clan?.logo && (
+                    <span className="text-2xl">
+                      {clan.logo.startsWith('http') ? (
+                        <img src={clan.logo} alt={standing.clan_name} className="h-8 w-8 object-contain" />
+                      ) : (
+                        clan.logo
+                      )}
+                    </span>
+                  )}
+                  <div className="font-semibold">{standing.clan_name}</div>
+                </div>
+                <div className={`text-xl font-bold ${isFirst ? 'text-accent' : 'text-foreground'}`}>
+                  {standing.total_points} pts
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+    );
+  };
+
+  const renderLeaguePodium = () => {
+    if (groupA.length === 0 && groupB.length === 0) {
+      return (
+        <p className="text-muted-foreground text-center py-8">No league standings available yet.</p>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+        {renderGroupStandings(groupA, 'Group A', 'text-primary')}
+        {renderGroupStandings(groupB, 'Group B', 'text-accent')}
+      </div>
+    );
+  };
+
+  return (
+    <div className="w-full max-w-5xl mx-auto px-2 sm:px-4">
+      <div className="text-center mb-6 md:mb-8">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
+          <Trophy className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-accent" />
+          {leaderboardType === 'league' ? 'League Standings' : 'Current Standings'}
+        </h2>
+        <p className="text-sm md:text-base text-muted-foreground">
+          {leaderboardType === 'league' ? 'Aggregated points across all sports' : 'Live podium updates'}
+        </p>
+      </div>
+
+      {leaderboardType === 'league' ? renderLeaguePodium() : renderPlayoffPodium()}
     </div>
   );
 }
