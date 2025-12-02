@@ -732,6 +732,7 @@ export type Database = {
         Args: { _clan_id: string; _user_id: string }
         Returns: boolean
       }
+      recalculate_all_league_standings: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "clan_leader" | "student"

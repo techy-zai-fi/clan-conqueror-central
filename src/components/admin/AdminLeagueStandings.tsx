@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Standing {
@@ -30,6 +32,7 @@ export default function AdminLeagueStandings() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [standings, setStandings] = useState<Standing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [recalculating, setRecalculating] = useState(false);
 
   useEffect(() => {
     fetchSports();
@@ -91,6 +94,20 @@ export default function AdminLeagueStandings() {
     }
   };
 
+  const handleRecalculateStandings = async () => {
+    setRecalculating(true);
+    try {
+      const { error } = await supabase.rpc('recalculate_all_league_standings');
+      if (error) throw error;
+      toast.success('League standings recalculated successfully');
+      fetchStandings();
+    } catch (error: any) {
+      toast.error('Error recalculating standings: ' + error.message);
+    } finally {
+      setRecalculating(false);
+    }
+  };
+
   const groupAStandings = standings.filter(s => s.group_name === 'A');
   const groupBStandings = standings.filter(s => s.group_name === 'B');
   const selectedSportData = sports.find(s => s.id === selectedSport);
@@ -145,7 +162,17 @@ export default function AdminLeagueStandings() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-foreground">League Standings</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-foreground">League Standings</h2>
+        <Button 
+          onClick={handleRecalculateStandings} 
+          disabled={recalculating}
+          variant="outline"
+        >
+          <RefreshCw className={`h-4 w-4 mr-2 ${recalculating ? 'animate-spin' : ''}`} />
+          {recalculating ? 'Recalculating...' : 'Recalculate Standings'}
+        </Button>
+      </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <div>
