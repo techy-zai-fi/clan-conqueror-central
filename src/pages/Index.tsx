@@ -17,6 +17,7 @@ interface Clan {
   name: string;
   tagline: string;
   logo: string;
+  color: string;
   total_points: number;
 }
 
@@ -34,14 +35,16 @@ interface SiteSettings {
   show_sponsors: boolean;
 }
 
-interface LeagueStanding {
+interface AggregatedLeagueStanding {
   clan_name: string;
+  group_name: string;
   total_points: number;
+  clan?: Clan;
 }
 
 export default function Index() {
   const [clans, setClans] = useState<Clan[]>([]);
-  const [leagueStandings, setLeagueStandings] = useState<LeagueStanding[]>([]);
+  const [leagueStandings, setLeagueStandings] = useState<AggregatedLeagueStanding[]>([]);
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [totalClans, setTotalClans] = useState(0);
   const [totalSports, setTotalSports] = useState(0);
@@ -57,32 +60,49 @@ export default function Index() {
       .from('site_settings')
       .select('logo_url, hero_logo_url, itcom_logo_url, active_leaderboard_type, show_sponsors')
       .limit(1)
-      .single();
+      .maybeSingle();
     
     if (settingsData) setSiteSettings(settingsData);
 
     const leaderboardType = settingsData?.active_leaderboard_type || 'playoff';
 
+    // Fetch clans for both modes (needed for logo/color info)
+    const { data: clansData } = await supabase
+      .from('clans')
+      .select('*')
+      .order('total_points', { ascending: false, nullsFirst: false });
+    
+    if (clansData) {
+      setClans(clansData);
+      setTotalClans(clansData.length);
+    }
+
     // Fetch appropriate leaderboard data
     if (leaderboardType === 'league') {
-      // Fetch league standings
+      // Fetch league standings and aggregate by clan across all sports
       const { data: standingsData } = await supabase
         .from('league_standings')
-        .select('clan_name, total_points')
-        .order('total_points', { ascending: false })
-        .limit(6);
+        .select('clan_name, group_name, total_points');
       
-      if (standingsData) setLeagueStandings(standingsData);
-    } else {
-      // Fetch playoff leaderboard (clans)
-      const { data: clansData } = await supabase
-        .from('clans')
-        .select('*')
-        .order('rank', { ascending: true, nullsFirst: false });
-      
-      if (clansData) {
-        setClans(clansData);
-        setTotalClans(clansData.length);
+      if (standingsData) {
+        // Aggregate points by clan_name and group_name across all sports
+        const aggregated: Record<string, AggregatedLeagueStanding> = {};
+        
+        standingsData.forEach((standing) => {
+          const key = `${standing.clan_name}-${standing.group_name}`;
+          if (!aggregated[key]) {
+            aggregated[key] = {
+              clan_name: standing.clan_name,
+              group_name: standing.group_name,
+              total_points: 0,
+              clan: clansData?.find(c => c.name === standing.clan_name)
+            };
+          }
+          aggregated[key].total_points += standing.total_points || 0;
+        });
+        
+        const sortedStandings = Object.values(aggregated).sort((a, b) => b.total_points - a.total_points);
+        setLeagueStandings(sortedStandings);
       }
     }
 
@@ -101,15 +121,11 @@ export default function Index() {
       .select('*', { count: 'exact', head: true });
     
     if (count) setTotalSports(count);
-
-    // Fetch total clans count if showing league leaderboard
-    if (leaderboardType === 'league') {
-      const { count: clansCount } = await supabase
-        .from('clans')
-        .select('*', { count: 'exact', head: true });
-      if (clansCount) setTotalClans(clansCount);
-    }
   };
+
+  // Group league standings by group
+  const groupA = leagueStandings.filter(s => s.group_name === 'Group A').sort((a, b) => b.total_points - a.total_points);
+  const groupB = leagueStandings.filter(s => s.group_name === 'Group B').sort((a, b) => b.total_points - a.total_points);
 
   return (
     <div className="min-h-screen bg-background">
@@ -169,7 +185,7 @@ export default function Index() {
 
         {/* Podium Section */}
         <section className="animate-scale-in">
-          <Podium />
+          <Podium leaderboardType={siteSettings?.active_leaderboard_type || 'playoff'} leagueStandings={leagueStandings} clans={clans} />
         </section>
 
         {/* Quick Stats */}
@@ -243,20 +259,64 @@ export default function Index() {
             <CardContent className="space-y-3">
               {siteSettings?.active_leaderboard_type === 'league' ? (
                 <>
-                  {leagueStandings.map((standing, index) => (
-                    <div
-                      key={`${standing.clan_name}-${index}`}
-                      className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border hover:border-primary/50 transition-all"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl font-bold text-muted-foreground w-8">
-                          {index + 1}
-                        </span>
-                        <div className="font-semibold">{standing.clan_name}</div>
-                      </div>
-                      <div className="text-2xl font-bold text-accent">{standing.total_points}</div>
+                  {/* Group A */}
+                  {groupA.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-muted-foreground mb-2">Group A</h4>
+                      {groupA.map((standing, index) => (
+                        <div
+                          key={`${standing.clan_name}-A-${index}`}
+                          className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border hover:border-primary/50 transition-all mb-2"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl font-bold text-muted-foreground w-6">
+                              {index + 1}
+                            </span>
+                            {standing.clan?.logo && (
+                              <span className="text-2xl">
+                                {standing.clan.logo.startsWith('http') ? (
+                                  <img src={standing.clan.logo} alt={standing.clan_name} className="h-6 w-6 object-contain" />
+                                ) : (
+                                  standing.clan.logo
+                                )}
+                              </span>
+                            )}
+                            <div className="font-semibold text-sm">{standing.clan_name}</div>
+                          </div>
+                          <div className="text-xl font-bold text-accent">{standing.total_points}</div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  {/* Group B */}
+                  {groupB.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-muted-foreground mb-2">Group B</h4>
+                      {groupB.map((standing, index) => (
+                        <div
+                          key={`${standing.clan_name}-B-${index}`}
+                          className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border hover:border-primary/50 transition-all mb-2"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl font-bold text-muted-foreground w-6">
+                              {index + 1}
+                            </span>
+                            {standing.clan?.logo && (
+                              <span className="text-2xl">
+                                {standing.clan.logo.startsWith('http') ? (
+                                  <img src={standing.clan.logo} alt={standing.clan_name} className="h-6 w-6 object-contain" />
+                                ) : (
+                                  standing.clan.logo
+                                )}
+                              </span>
+                            )}
+                            <div className="font-semibold text-sm">{standing.clan_name}</div>
+                          </div>
+                          <div className="text-xl font-bold text-accent">{standing.total_points}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </>
               ) : (
                 <>
