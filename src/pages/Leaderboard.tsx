@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,23 +18,20 @@ interface Clan {
   bronze_medals: number;
 }
 
+const fetchClans = async (): Promise<Clan[]> => {
+  const { data } = await supabase
+    .from('clans')
+    .select('*')
+    .order('total_points', { ascending: false, nullsFirst: false });
+  
+  return data || [];
+};
+
 export default function Leaderboard() {
-  const [clans, setClans] = useState<Clan[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchClans();
-  }, []);
-
-  const fetchClans = async () => {
-    const { data } = await supabase
-      .from('clans')
-      .select('*')
-      .order('rank', { ascending: true, nullsFirst: false });
-    
-    if (data) setClans(data);
-    setLoading(false);
-  };
+  const { data: clans = [], isLoading: loading } = useQuery({
+    queryKey: ['leaderboard-clans'],
+    queryFn: fetchClans,
+  });
 
   if (loading) {
     return (
