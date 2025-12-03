@@ -49,23 +49,30 @@ export default function SportStandings() {
     if (sportData) setSport(sportData);
 
     // Fetch standings for both groups
-    const categoryFilter = sportData?.has_categories ? category : null;
-
-    const { data: groupAData } = await supabase
+    let groupAQuery = supabase
       .from('league_standings')
       .select('*')
       .eq('sport_id', sportId)
       .eq('group_name', 'A')
-      .eq('category', categoryFilter)
       .order('total_points', { ascending: false });
 
-    const { data: groupBData } = await supabase
+    let groupBQuery = supabase
       .from('league_standings')
       .select('*')
       .eq('sport_id', sportId)
       .eq('group_name', 'B')
-      .eq('category', categoryFilter)
       .order('total_points', { ascending: false });
+
+    if (sportData?.has_categories) {
+      groupAQuery = groupAQuery.eq('category', category);
+      groupBQuery = groupBQuery.eq('category', category);
+    } else {
+      groupAQuery = groupAQuery.or('category.is.null,category.eq.');
+      groupBQuery = groupBQuery.or('category.is.null,category.eq.');
+    }
+
+    const { data: groupAData } = await groupAQuery;
+    const { data: groupBData } = await groupBQuery;
 
     if (groupAData) setGroupAStandings(groupAData);
     if (groupBData) setGroupBStandings(groupBData);

@@ -1,6 +1,7 @@
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -32,6 +33,7 @@ export default function Schedule() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [sportName, setSportName] = useState<string>('');
   const [sportsMap, setSportsMap] = useState<Record<string, string>>({});
+  const [filter, setFilter] = useState<'upcoming' | 'completed'>('upcoming');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,8 +53,8 @@ export default function Schedule() {
       let query = supabase
         .from('matches')
         .select('*')
-        .eq('status', 'upcoming')
-        .order('date', { ascending: true });
+        .eq('status', filter)
+        .order('date', { ascending: filter === 'upcoming' });
 
       if (sportId) {
         query = query.eq('sport_id', sportId);
@@ -80,19 +82,34 @@ export default function Schedule() {
     };
 
     fetchData();
-  }, [sportId]);
+  }, [sportId, filter]);
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       
       <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-12 animate-fade-in">
+        <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             {sportName ? `${sportName} ` : 'Match '}<span className="text-accent">Schedule</span>
           </h1>
           <p className="text-xl text-muted-foreground">
-            {sportName ? `All ${sportName} matches` : 'All upcoming and live matches'}
+            {sportName ? `All ${sportName} matches` : 'View upcoming and completed matches'}
           </p>
+        </div>
+
+        <div className="flex justify-center gap-4 mb-8">
+          <Button
+            variant={filter === 'upcoming' ? 'default' : 'outline'}
+            onClick={() => setFilter('upcoming')}
+          >
+            Upcoming
+          </Button>
+          <Button
+            variant={filter === 'completed' ? 'default' : 'outline'}
+            onClick={() => setFilter('completed')}
+          >
+            Completed
+          </Button>
         </div>
 
         <div className="max-w-4xl mx-auto space-y-6">
@@ -126,8 +143,8 @@ export default function Schedule() {
                 <div className="flex items-center justify-center gap-3 md:gap-6 py-4">
                   <div className="text-center flex-1">
                     <div className="text-base sm:text-lg md:text-2xl font-bold text-foreground">{match.clan1}</div>
-                    {match.status === 'live' && (
-                      <div className="text-2xl md:text-3xl font-bold text-accent mt-2">{match.score1}</div>
+                    {match.status === 'completed' && (
+                      <div className="text-2xl md:text-3xl font-bold text-accent mt-2">{match.score1 ?? '-'}</div>
                     )}
                   </div>
                   
@@ -135,8 +152,8 @@ export default function Schedule() {
                   
                   <div className="text-center flex-1">
                     <div className="text-base sm:text-lg md:text-2xl font-bold text-foreground">{match.clan2}</div>
-                    {match.status === 'live' && (
-                      <div className="text-2xl md:text-3xl font-bold text-accent mt-2">{match.score2}</div>
+                    {match.status === 'completed' && (
+                      <div className="text-2xl md:text-3xl font-bold text-accent mt-2">{match.score2 ?? '-'}</div>
                     )}
                   </div>
                 </div>
