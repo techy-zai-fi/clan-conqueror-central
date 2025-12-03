@@ -29,15 +29,23 @@ export default function SportStandings() {
   const [sport, setSport] = useState<Sport | null>(null);
   const [groupAStandings, setGroupAStandings] = useState<Standing[]>([]);
   const [groupBStandings, setGroupBStandings] = useState<Standing[]>([]);
-  const [category, setCategory] = useState<string>('male');
+  const [category, setCategory] = useState<string>('');
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSportAndStandings();
-  }, [sportId, category]);
+    fetchSportAndCategories();
+  }, [sportId]);
 
-  const fetchSportAndStandings = async () => {
+  useEffect(() => {
+    if (category) {
+      fetchStandings();
+    }
+  }, [category]);
+
+  const fetchSportAndCategories = async () => {
     if (!sportId) return;
+    setLoading(true);
 
     // Fetch sport details
     const { data: sportData } = await supabase
@@ -48,7 +56,33 @@ export default function SportStandings() {
 
     if (sportData) setSport(sportData);
 
-    // Fetch standings for both groups
+    if (sportData?.has_categories) {
+      // Fetch distinct categories that have standings for this sport
+      const { data: categoriesData } = await supabase
+        .from('league_standings')
+        .select('category')
+        .eq('sport_id', sportId)
+        .not('category', 'is', null)
+        .not('category', 'eq', '');
+
+      const uniqueCategories = [...new Set(categoriesData?.map(c => c.category).filter(Boolean))] as string[];
+      setAvailableCategories(uniqueCategories);
+      
+      // Set first available category as default
+      if (uniqueCategories.length > 0 && !category) {
+        setCategory(uniqueCategories[0]);
+      } else if (uniqueCategories.length === 0) {
+        setLoading(false);
+      }
+    } else {
+      setAvailableCategories([]);
+      setCategory('none');
+    }
+  };
+
+  const fetchStandings = async () => {
+    if (!sportId || !sport) return;
+
     let groupAQuery = supabase
       .from('league_standings')
       .select('*')
@@ -63,7 +97,7 @@ export default function SportStandings() {
       .eq('group_name', 'B')
       .order('total_points', { ascending: false });
 
-    if (sportData?.has_categories) {
+    if (sport?.has_categories && category !== 'none') {
       groupAQuery = groupAQuery.eq('category', category);
       groupBQuery = groupBQuery.eq('category', category);
     } else {
@@ -168,12 +202,14 @@ export default function SportStandings() {
           </p>
         </div>
 
-        {sport.has_categories ? (
+        {sport.has_categories && availableCategories.length > 0 ? (
           <Tabs value={category} onValueChange={setCategory} className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">
-              <TabsTrigger value="male" className="text-foreground">Male</TabsTrigger>
-              <TabsTrigger value="female" className="text-foreground">Female</TabsTrigger>
-              <TabsTrigger value="mixed" className="text-foreground">Mixed</TabsTrigger>
+            <TabsList className={`grid w-full max-w-md mx-auto mb-8 grid-cols-${availableCategories.length}`}>
+              {availableCategories.map((cat) => (
+                <TabsTrigger key={cat} value={cat} className="text-foreground capitalize">
+                  {cat}
+                </TabsTrigger>
+              ))}
             </TabsList>
 
             <TabsContent value={category}>
