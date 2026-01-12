@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Trophy, Medal, TrendingUp, Award, Users, CheckCircle, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Trophy, Medal, TrendingUp, Award, Users, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Clan {
   id: string;
@@ -116,6 +118,42 @@ const fetchClanMatches = async (clanName: string): Promise<Match[]> => {
 export default function Leaderboard() {
   const [selectedClan, setSelectedClan] = useState<AggregatedLeagueStanding | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    checkAdminRole();
+  }, []);
+
+  const checkAdminRole = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin');
+      setIsAdmin(roles && roles.length > 0);
+    }
+  };
+
+  const handleRefreshPlayoffPoints = async () => {
+    setRefreshing(true);
+    try {
+      const { error } = await supabase.rpc('recalculate_playoff_points');
+      if (error) throw error;
+      
+      // Refresh the clans data
+      await queryClient.invalidateQueries({ queryKey: ['leaderboard-clans'] });
+      toast.success('Playoff points recalculated successfully!');
+    } catch (error) {
+      console.error('Error refreshing points:', error);
+      toast.error('Failed to refresh points');
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const { data: leaderboardType = 'playoff' } = useQuery({
     queryKey: ['site-settings-leaderboard'],
@@ -383,6 +421,17 @@ export default function Leaderboard() {
               ? 'Combined league points across all sports' 
               : 'Live standings updated after each match'}
           </p>
+          {isAdmin && leaderboardType === 'playoff' && (
+            <Button 
+              onClick={handleRefreshPlayoffPoints} 
+              variant="outline" 
+              className="mt-4 gap-2"
+              disabled={refreshing}
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? 'Recalculating...' : 'Refresh Playoff Points'}
+            </Button>
+          )}
         </div>
 
         {leaderboardType === 'league' ? (

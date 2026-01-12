@@ -733,6 +733,7 @@ export type Database = {
         Returns: boolean
       }
       recalculate_all_league_standings: { Args: never; Returns: undefined }
+      recalculate_playoff_points: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "clan_leader" | "student"
