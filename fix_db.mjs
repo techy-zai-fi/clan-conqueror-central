@@ -1,12 +1,15 @@
--- Drop and recreate the function with proper WHERE clauses
-CREATE OR REPLACE FUNCTION public.recalculate_playoff_points()
+import fetch from 'node-fetch'
+
+const projectId = 'byfduqxidezyyblpddbr'
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5ZmR1cXhpZGV6eXlibHBkZGJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDIzODQsImV4cCI6MjA3NDgxODM4NH0.UuJURG_JV1rTY4B7Klfn12pl9mwnvog9zEXrjVC6HQ0'
+
+const sql = `CREATE OR REPLACE FUNCTION public.recalculate_playoff_points()
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path TO 'public'
 AS $$
 BEGIN
-  -- Reset all clan points and medals (WHERE true to satisfy requirement)
   UPDATE clans 
   SET 
     total_points = 0,
@@ -15,7 +18,6 @@ BEGIN
     bronze_medals = 0
   WHERE true;
 
-  -- Recalculate gold medals and points from final winners
   UPDATE clans c
   SET 
     gold_medals = subquery.gold_count,
@@ -30,7 +32,6 @@ BEGIN
   ) subquery
   WHERE c.name = subquery.winner;
 
-  -- Recalculate silver medals and points from final losers
   UPDATE clans c
   SET 
     silver_medals = subquery.silver_count,
@@ -47,7 +48,6 @@ BEGIN
   ) subquery
   WHERE c.name = subquery.loser;
 
-  -- Recalculate bronze medals and points from third place winners
   UPDATE clans c
   SET 
     bronze_medals = subquery.bronze_count,
@@ -62,4 +62,27 @@ BEGIN
   ) subquery
   WHERE c.name = subquery.winner;
 END;
-$$;
+$$;`
+
+async function fixDB() {
+  try {
+    const response = await fetch(
+      `https://${projectId}.supabase.co/rest/v1/rpc/exec_sql`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sql_text: sql })
+      }
+    )
+    
+    const data = await response.text()
+    console.log('Response:', response.status, data)
+  } catch (err) {
+    console.error('Error:', err.message)
+  }
+}
+
+fixDB()

@@ -1,4 +1,4 @@
--- Drop and recreate the function with proper WHERE clauses
+-- Fix recalculate_playoff_points function with proper WHERE clauses
 CREATE OR REPLACE FUNCTION public.recalculate_playoff_points()
 RETURNS void
 LANGUAGE plpgsql
@@ -6,7 +6,6 @@ SECURITY DEFINER
 SET search_path TO 'public'
 AS $$
 BEGIN
-  -- Reset all clan points and medals (WHERE true to satisfy requirement)
   UPDATE clans 
   SET 
     total_points = 0,
@@ -15,7 +14,6 @@ BEGIN
     bronze_medals = 0
   WHERE true;
 
-  -- Recalculate gold medals and points from final winners
   UPDATE clans c
   SET 
     gold_medals = subquery.gold_count,
@@ -30,7 +28,6 @@ BEGIN
   ) subquery
   WHERE c.name = subquery.winner;
 
-  -- Recalculate silver medals and points from final losers
   UPDATE clans c
   SET 
     silver_medals = subquery.silver_count,
@@ -47,7 +44,6 @@ BEGIN
   ) subquery
   WHERE c.name = subquery.loser;
 
-  -- Recalculate bronze medals and points from third place winners
   UPDATE clans c
   SET 
     bronze_medals = subquery.bronze_count,

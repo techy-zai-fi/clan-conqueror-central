@@ -1,4 +1,11 @@
--- Drop and recreate the function with proper WHERE clauses
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = 'https://byfduqxidezyyblpddbr.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5ZmR1cXhpZGV6eXlibHBkZGJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNDIzODQsImV4cCI6MjA3NDgxODM4NH0.UuJURG_JV1rTY4B7Klfn12pl9mwnvog9zEXrjVC6HQ0'
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+const sql = `
 CREATE OR REPLACE FUNCTION public.recalculate_playoff_points()
 RETURNS void
 LANGUAGE plpgsql
@@ -6,7 +13,6 @@ SECURITY DEFINER
 SET search_path TO 'public'
 AS $$
 BEGIN
-  -- Reset all clan points and medals (WHERE true to satisfy requirement)
   UPDATE clans 
   SET 
     total_points = 0,
@@ -15,7 +21,6 @@ BEGIN
     bronze_medals = 0
   WHERE true;
 
-  -- Recalculate gold medals and points from final winners
   UPDATE clans c
   SET 
     gold_medals = subquery.gold_count,
@@ -30,7 +35,6 @@ BEGIN
   ) subquery
   WHERE c.name = subquery.winner;
 
-  -- Recalculate silver medals and points from final losers
   UPDATE clans c
   SET 
     silver_medals = subquery.silver_count,
@@ -47,7 +51,6 @@ BEGIN
   ) subquery
   WHERE c.name = subquery.loser;
 
-  -- Recalculate bronze medals and points from third place winners
   UPDATE clans c
   SET 
     bronze_medals = subquery.bronze_count,
@@ -63,3 +66,16 @@ BEGIN
   WHERE c.name = subquery.winner;
 END;
 $$;
+`
+
+async function fixDatabase() {
+  try {
+    const { data, error } = await supabase.rpc('exec_sql', { sql_text: sql })
+    if (error) throw error
+    console.log('✅ Database function updated successfully!')
+  } catch (err) {
+    console.error('Error executing SQL:', err)
+  }
+}
+
+fixDatabase()

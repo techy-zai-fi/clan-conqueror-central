@@ -49,8 +49,9 @@ export default function AdminPlayoffs() {
       if (error) throw error;
       toast.success('Playoff points recalculated successfully!');
     } catch (error) {
-      console.error('Error refreshing points:', error);
-      toast.error('Failed to refresh points');
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      console.error('Error refreshing points:', errorMessage);
+      toast.error(`Failed to refresh points: ${errorMessage}`);
     } finally {
       setRefreshing(false);
     }
