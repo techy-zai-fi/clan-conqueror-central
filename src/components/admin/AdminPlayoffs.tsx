@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Sport {
@@ -39,6 +40,21 @@ export default function AdminPlayoffs() {
   const [playoffStages, setPlayoffStages] = useState<PlayoffStage[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefreshPlayoffPoints = async () => {
+    setRefreshing(true);
+    try {
+      const { error } = await supabase.rpc('recalculate_playoff_points');
+      if (error) throw error;
+      toast.success('Playoff points recalculated successfully!');
+    } catch (error) {
+      console.error('Error refreshing points:', error);
+      toast.error('Failed to refresh points');
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     fetchSports();
@@ -163,10 +179,23 @@ export default function AdminPlayoffs() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-foreground">Playoffs</h2>
-      <p className="text-muted-foreground">
-        Manage semifinals, third place, and final matches for each sport
-      </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Playoffs</h2>
+          <p className="text-muted-foreground">
+            Manage semifinals, third place, and final matches for each sport
+          </p>
+        </div>
+        <Button 
+          onClick={handleRefreshPlayoffPoints} 
+          variant="outline" 
+          className="gap-2"
+          disabled={refreshing}
+        >
+          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Recalculating...' : 'Refresh Playoff Points'}
+        </Button>
+      </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <div>
