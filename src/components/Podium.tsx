@@ -7,6 +7,9 @@ interface Clan {
   logo: string;
   color: string;
   total_points: number;
+  gold_medals?: number;
+  silver_medals?: number;
+  bronze_medals?: number;
 }
 
 interface AggregatedLeagueStanding {
@@ -57,7 +60,12 @@ export default function Podium({ leaderboardType, leagueStandings, clans }: Podi
             )}
           </div>
           <h3 className="text-xs sm:text-sm md:text-lg font-bold text-center mb-1 truncate w-full">{second.name}</h3>
-          <p className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground mb-1 md:mb-2">{second.total_points}</p>
+          <div className="flex items-center gap-1 mb-1">
+            <span className="text-yellow-400 text-xs">🥇{second.gold_medals || 0}</span>
+            <span className="text-zinc-400 text-xs">🥈{second.silver_medals || 0}</span>
+            <span className="text-amber-700 text-xs">🥉{second.bronze_medals || 0}</span>
+          </div>
+          <p className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground mb-1 md:mb-2">{second.total_points} pts</p>
           <div className="w-16 h-20 sm:w-18 sm:h-28 md:w-20 md:h-32 bg-gradient-to-t from-zinc-400/30 to-transparent rounded-t-lg" />
           <div className="mt-1 sm:mt-1.5 md:mt-2 text-lg sm:text-xl md:text-2xl font-bold text-zinc-400">2nd</div>
         </Card>
@@ -81,7 +89,12 @@ export default function Podium({ leaderboardType, leagueStandings, clans }: Podi
             )}
           </div>
           <h3 className="text-sm sm:text-base md:text-xl font-bold text-center mb-1 md:mb-2 truncate w-full">{first.name}</h3>
-          <p className="text-xl sm:text-3xl md:text-4xl font-bold text-accent mb-2 md:mb-3">{first.total_points}</p>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-yellow-400 text-sm">🥇{first.gold_medals || 0}</span>
+            <span className="text-zinc-400 text-sm">🥈{first.silver_medals || 0}</span>
+            <span className="text-amber-700 text-sm">🥉{first.bronze_medals || 0}</span>
+          </div>
+          <p className="text-xl sm:text-3xl md:text-4xl font-bold text-accent mb-2 md:mb-3">{first.total_points} pts</p>
           <div className="w-20 h-32 sm:w-22 sm:h-42 md:w-24 md:h-48 bg-gradient-to-t from-accent/40 via-accent/20 to-transparent rounded-t-lg" />
           <div className="mt-2 sm:mt-2.5 md:mt-3 text-xl sm:text-2xl md:text-3xl font-bold text-accent">1st</div>
         </Card>
@@ -106,7 +119,12 @@ export default function Podium({ leaderboardType, leagueStandings, clans }: Podi
             )}
           </div>
           <h3 className="text-xs sm:text-sm md:text-lg font-bold text-center mb-1 truncate w-full">{third.name}</h3>
-          <p className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground mb-1 md:mb-2">{third.total_points}</p>
+          <div className="flex items-center gap-1 mb-1">
+            <span className="text-yellow-400 text-xs">🥇{third.gold_medals || 0}</span>
+            <span className="text-zinc-400 text-xs">🥈{third.silver_medals || 0}</span>
+            <span className="text-amber-700 text-xs">🥉{third.bronze_medals || 0}</span>
+          </div>
+          <p className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground mb-1 md:mb-2">{third.total_points} pts</p>
           <div className="w-16 h-16 sm:w-18 sm:h-20 md:w-20 md:h-24 bg-gradient-to-t from-amber-700/30 to-transparent rounded-t-lg" />
           <div className="mt-1 sm:mt-1.5 md:mt-2 text-lg sm:text-xl md:text-2xl font-bold text-amber-700">3rd</div>
         </Card>
