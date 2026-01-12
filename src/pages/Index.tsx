@@ -19,6 +19,9 @@ interface Clan {
   logo: string;
   color: string;
   total_points: number;
+  gold_medals?: number;
+  silver_medals?: number;
+  bronze_medals?: number;
 }
 
 interface Highlight {
